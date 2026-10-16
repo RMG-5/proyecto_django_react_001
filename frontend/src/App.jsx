@@ -111,9 +111,21 @@ function App() {
       setLongitud(null);
     } catch (err) {
       console.error(err);
-      setErrorGps(
-        "Hubo un error al intentar guardar tu checada en el servidor.",
-      );
+
+      // REVISAMOS SI DJANGO NOS ENVIÓ EL ERROR DE GEOCERCA
+      if (
+        err.response &&
+        err.response.data &&
+        err.response.data.error_geocerca
+      ) {
+        // Si existe, le mostramos al empleado el mensaje exacto que escribió Django
+        setErrorGps(err.response.data.error_geocerca);
+      } else {
+        // Si es otro tipo de error (red, caída de servidor, etc.) dejamos el genérico
+        setErrorGps(
+          "Hubo un error al intentar guardar tu checada en el servidor.",
+        );
+      }
     } finally {
       setEnviandoRegistro(false);
     }

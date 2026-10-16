@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 2FhzEqWkH5rKh5XdlfRKEXplYZMQmeUhHqhBWDAYdOEz1hHb2IHolA6BuRNir5r
+\restrict 8NAxkNN2A6owRMqWk5ceLdngLfgtOzycVHk8c0gdz0DzmV2GFeXeIWAFKpOYhw8
 
 -- Dumped from database version 18.6 (Debian 18.6-1.pgdg13+2)
 -- Dumped by pg_dump version 18.6 (Debian 18.6-1.pgdg13+2)
@@ -345,7 +345,11 @@ ALTER TABLE public.django_session OWNER TO admin;
 COPY public.asistencias_registroasistencia (id, fecha_hora, tipo, latitud, longitud, dispositivo, usuario_id) FROM stdin;
 1	2026-10-16 15:49:37.011537+00	ENTRADA	19.700600	-101.185600	\N	2
 2	2026-10-16 15:49:49.768644+00	ENTRADA	19.700600	-101.185600	\N	3
-3	2026-10-16 15:49:57.601165+00	SALIDA	19.700600	-101.185600	\N	1
+7	2026-10-16 16:35:13.894541+00	SALIDA	19.702928	-101.117854	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+8	2026-10-16 16:40:42.369867+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1
+9	2026-10-16 16:42:49.899901+00	ENTRADA	19.702931	-101.117851	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+10	2026-10-16 16:58:38.962555+00	ENTRADA	19.702929	-101.117851	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+11	2026-10-16 17:08:18.246873+00	SALIDA	19.702928	-101.117874	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
 \.
 
 
@@ -458,6 +462,10 @@ COPY public.django_admin_log (id, action_time, object_id, object_repr, action_fl
 6	2026-10-16 15:49:37.012501+00	1	Juan_Perez_001 - ENTRADA - 16/10/2026 15:49	1	[{"added": {}}]	9	1
 7	2026-10-16 15:49:49.7694+00	2	Pedro_Chavez_002 - ENTRADA - 16/10/2026 15:49	1	[{"added": {}}]	9	1
 8	2026-10-16 15:49:57.601861+00	3	rmg5 - SALIDA - 16/10/2026 15:49	1	[{"added": {}}]	9	1
+9	2026-10-16 16:43:07.535291+00	6	rmg5 - ENTRADA - 16/10/2026 16:33	3		9	1
+10	2026-10-16 16:43:07.535454+00	5	rmg5 - ENTRADA - 16/10/2026 16:32	3		9	1
+11	2026-10-16 16:43:07.535482+00	4	rmg5 - ENTRADA - 16/10/2026 16:32	3		9	1
+12	2026-10-16 16:43:07.535505+00	3	rmg5 - SALIDA - 16/10/2026 15:49	3		9	1
 \.
 
 
@@ -522,7 +530,7 @@ mqznwnies5brandtu9jllvhe5g4bcuuk	.eJxVjDsOwjAQBe_iGlneJLZ3Kek5g7X-4QCypTipEHeHSC
 -- Name: asistencias_registroasistencia_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 3, true);
+SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 11, true);
 
 
 --
@@ -571,7 +579,7 @@ SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.django_admin_log_id_seq', 8, true);
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 12, true);
 
 
 --
@@ -945,5 +953,5 @@ ALTER TABLE ONLY public.django_admin_log
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 2FhzEqWkH5rKh5XdlfRKEXplYZMQmeUhHqhBWDAYdOEz1hHb2IHolA6BuRNir5r
+\unrestrict 8NAxkNN2A6owRMqWk5ceLdngLfgtOzycVHk8c0gdz0DzmV2GFeXeIWAFKpOYhw8
 
