@@ -1,30 +1,61 @@
 import React, { useState, useEffect } from "react";
-// Importamos Axios para poder hacer las peticiones HTTP a Django
 import axios from "axios";
 
 function App() {
-  // --- ESTADOS DE LA APLICACIÓN ---
+  // --- ESTADOS DE AUTENTICACIÓN ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // --- REVISAR SI YA EXISTE UN TOKEN AL CARGAR LA PÁGINA ---
+  // --- ESTADOS DEL GPS ---
+  const [latitud, setLatitud] = useState(null);
+  const [longitud, setLongitud] = useState(null);
+  const [cargandoGps, setCargandoGps] = useState(false);
+  const [errorGps, setErrorGps] = useState("");
+
+  // --- NUEVOS ESTADOS PARA EL REGISTRO DE ASISTENCIA ---
+  const [enviandoRegistro, setEnviandoRegistro] = useState(false);
+  const [mensajeExito, setMensajeExito] = useState("");
+
   useEffect(() => {
-    /* Al encender la app, revisamos si guardamos un token en el navegador anteriormente */
     const token = localStorage.getItem("user_token");
     if (token) {
       setIsLoggedIn(true);
     }
   }, []);
 
-  // --- FUNCIÓN PARA INICIAR SESIÓN ---
+  // Capturar coordenadas reales del GPS
+  const obtenerUbicacion = () => {
+    if (!navigator.geolocation) {
+      setErrorGps("Tu navegador no soporta geolocalización.");
+      return;
+    }
+    setCargandoGps(true);
+    setErrorGps("");
+    setMensajeExito("");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitud(position.coords.latitude);
+        setLongitud(position.coords.longitude);
+        setCargandoGps(false);
+      },
+      (error) => {
+        console.error(error);
+        setCargandoGps(false);
+        setErrorGps("Error al obtener ubicación. Activa tu GPS.");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+    );
+  };
+
+  // Función para procesar el inicio de sesión
   const handleLogin = async (e) => {
-    e.preventDefault(); // Evita que la página se recargue al enviar el formulario
+    e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       /* Hacemos una petición POST a la ventanilla de login de Django */
       const response = await axios.post(
@@ -34,55 +65,132 @@ function App() {
           password: password,
         },
       );
-
-      /* Si todo sale bien, Django nos responde con un objeto que tiene { token: "..." } */
-      const tokenRecibido = response.data.token;
-
-      /* Guardamos el token de forma persistente en el navegador del usuario */
-      localStorage.setItem("user_token", tokenRecibido);
-
-      /* Cambiamos el estado para darle paso al panel del checador */
+      localStorage.setItem("user_token", response.data.token);
       setIsLoggedIn(true);
-
-      /* Limpiamos los campos del formulario */
       setUsername("");
       setPassword("");
     } catch (err) {
-      /* Si los datos están mal, Django nos arroja un error 400 */
-      console.error(err);
-      setError("Usuario o contraseña incorrectos. Intenta de nuevo.");
+      setError("Usuario o contraseña incorrectos.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- FUNCIÓN PARA CERRAR SESIÓN ---
-  const handleLogout = () => {
-    /* Borramos el token del navegador para bloquear el acceso futuro */
-    localStorage.removeItem("user_token");
-    setIsLoggedIn(false);
+  // --- NUEVA FUNCIÓN: ENVIAR LA CHECADA COMPLETA AL BACKEND ---
+  const registrarAsistencia = async (tipoEvento) => {
+    setEnviandoRegistro(true);
+    setErrorGps("");
+    setMensajeExito("");
+
+    // 1. Recuperamos el brazalete (Token) del almacenamiento del navegador
+    const token = localStorage.getItem("user_token");
+
+    try {
+      // 2. Hacemos la petición POST al endpoint protegido de Django
+      // Pasamos el JSON con los datos que nos pide el Serializer de Django
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/asistencias/`,
+        {
+          tipo: tipoEvento,
+          latitud: parseFloat(latitud).toFixed(6), // Asegura 6 decimales exactos
+          longitud: parseFloat(longitud).toFixed(6),
+          dispositivo: navigator.userAgent.substring(0, 100), // Detecta el modelo de cel o navegador
+        },
+        {
+          // EN LA CABECERA INYECTAMOS EL TOKEN DE SEGURIDAD (Igual que en ModHeader)
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        },
+      );
+
+      // 3. Si la API nos devuelve éxito (201 Created), lo celebramos en pantalla
+      setMensajeExito(`¡Checada de ${tipoEvento} registrada correctamente!`);
+      // Limpiamos las coordenadas anteriores para obligar a capturar una nueva en la siguiente checada
+      setLatitud(null);
+      setLongitud(null);
+    } catch (err) {
+      console.error(err);
+      setErrorGps(
+        "Hubo un error al intentar guardar tu checada en el servidor.",
+      );
+    } finally {
+      setEnviandoRegistro(false);
+    }
   };
 
-  // --- RENDERIZADO VISUAL ---
+  const handleLogout = () => {
+    localStorage.removeItem("user_token");
+    setIsLoggedIn(false);
+    setLatitud(null);
+    setLongitud(null);
+    setMensajeExito("");
+  };
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
         <h1>📍 Sistema Checador GPS</h1>
-        <p>Conexión segura entre React y Django API</p>
+        <p>Solución Full-Stack con Docker</p>
       </header>
 
       <main style={styles.main}>
         {isLoggedIn ? (
-          /* PANTALLA 1: EL CHECADOR (Se muestra solo si tiene un token válido) */
           <div style={styles.card}>
-            <h2 style={{ color: "#2f855a" }}>🔓 Sesión Iniciada</h2>
-            <p style={{ color: "#4a5568", marginBottom: "20px" }}>
-              Tu token de seguridad está activo en este navegador.
-            </p>
+            <h2 style={{ color: "#2f855a", textAlign: "center" }}>
+              🔓 Sesión Activa
+            </h2>
 
-            {/* Próximamente aquí pondremos el botón del GPS real */}
-            <div style={styles.gpsPlaceholder}>
-              [ Aquí irá el botón para capturar GPS ]
+            <div style={styles.gpsSection}>
+              {/* Botón inicial para despertar los satélites */}
+              <button
+                style={styles.buttonGps}
+                onClick={obtenerUbicacion}
+                disabled={cargandoGps || enviandoRegistro}
+              >
+                {cargandoGps
+                  ? "Buscando satélites..."
+                  : "🎯 Capturar Coordenadas Actuales"}
+              </button>
+
+              {errorGps && <p style={styles.errorAlert}>{errorGps}</p>}
+              {mensajeExito && (
+                <p style={styles.successAlert}>{mensajeExito}</p>
+              )}
+
+              {/* Si ya tenemos la ubicación fija, mostramos los botones de acción definitiva */}
+              {latitud && longitud && (
+                <div style={styles.coordenadasBox}>
+                  <p style={{ margin: "0 0 10px 0" }}>
+                    <strong>Ubicación lista para checar</strong>
+                  </p>
+
+                  {/* BOTÓN DE ENTRADA */}
+                  <button
+                    style={{
+                      ...styles.buttonAccion,
+                      backgroundColor: "#38a169",
+                    }}
+                    onClick={() => registrarAsistencia("ENTRADA")}
+                    disabled={enviandoRegistro}
+                  >
+                    ⬇️ Registrar Entrada
+                  </button>
+
+                  {/* BOTÓN DE SALIDA */}
+                  <button
+                    style={{
+                      ...styles.buttonAccion,
+                      backgroundColor: "#dd6b20",
+                      marginTop: "8px",
+                    }}
+                    onClick={() => registrarAsistencia("SALIDA")}
+                    disabled={enviandoRegistro}
+                  >
+                    ⬆️ Registrar Salida
+                  </button>
+                </div>
+              )}
             </div>
 
             <button style={styles.buttonLogout} onClick={handleLogout}>
@@ -90,13 +198,9 @@ function App() {
             </button>
           </div>
         ) : (
-          /* PANTALLA 2: FORMULARIO DE LOGIN (Se muestra si no hay token) */
           <div style={styles.card}>
-            <h2>Iniciar Sesión</h2>
-
-            {/* Alerta si el usuario se equivoca */}
+            <h2 style={{ textAlign: "center" }}>Iniciar Sesión</h2>
             {error && <p style={styles.errorAlert}>{error}</p>}
-
             <form onSubmit={handleLogin} style={styles.form}>
               <div style={styles.inputGroup}>
                 <label style={styles.label}>Usuario:</label>
@@ -106,10 +210,8 @@ function App() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  placeholder="Ej. admin"
                 />
               </div>
-
               <div style={styles.inputGroup}>
                 <label style={styles.label}>Contraseña:</label>
                 <input
@@ -118,10 +220,8 @@ function App() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="Tu contraseña secreta"
                 />
               </div>
-
               <button
                 type="submit"
                 style={styles.buttonLogin}
@@ -137,7 +237,6 @@ function App() {
   );
 }
 
-// --- ESTILOS EN LÍNEA (Actualizados para el Formulario) ---
 const styles = {
   container: {
     fontFamily: "system-ui, sans-serif",
@@ -148,34 +247,19 @@ const styles = {
     alignItems: "center",
     padding: "20px",
   },
-  header: {
-    textAlign: "center",
-    marginBottom: "30px",
-    color: "#1a202c",
-  },
-  main: {
-    width: "100%",
-    maxWidth: "400px",
-  },
+  header: { textAlign: "center", marginBottom: "30px", color: "#1a202c" },
+  main: { width: "100%", maxWidth: "400px" },
   card: {
     backgroundColor: "#ffffff",
     padding: "30px",
     borderRadius: "12px",
-    boxShadow: "0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1)",
+    boxShadow: "0 4px 6px rgba(0,0,0,0.05)",
   },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    marginTop: "15px",
-  },
-  inputGroup: {
-    marginBottom: "15px",
-    textAlign: "left",
-  },
+  form: { display: "flex", flexDirection: "column", marginTop: "15px" },
+  inputGroup: { marginBottom: "15px" },
   label: {
     display: "block",
     marginBottom: "5px",
-    fontWeight: "6px",
     color: "#4a5568",
     fontSize: "14px",
   },
@@ -195,9 +279,7 @@ const styles = {
     borderRadius: "6px",
     fontSize: "16px",
     cursor: "pointer",
-    width: "100%",
     fontWeight: "bold",
-    marginTop: "10px",
   },
   buttonLogout: {
     backgroundColor: "#e53e3e",
@@ -207,8 +289,8 @@ const styles = {
     borderRadius: "6px",
     fontSize: "16px",
     cursor: "pointer",
-    width: "100%",
     fontWeight: "bold",
+    width: "100%",
   },
   errorAlert: {
     backgroundColor: "#fed7d7",
@@ -219,14 +301,45 @@ const styles = {
     textAlign: "center",
     margin: "10px 0",
   },
-  gpsPlaceholder: {
-    backgroundColor: "#edf2f7",
-    border: "2px dashed #cbd5e0",
-    padding: "30px 10px",
-    borderRadius: "8px",
+  successAlert: {
+    backgroundColor: "#c6f6d5",
+    color: "#22543d",
+    padding: "10px",
+    borderRadius: "6px",
+    fontSize: "14px",
     textAlign: "center",
-    color: "#718096",
-    marginBottom: "20px",
+    margin: "10px 0",
+    fontWeight: "500",
+  },
+  gpsSection: { margin: "25px 0", textAlign: "center" },
+  buttonGps: {
+    backgroundColor: "#2b6cb0",
+    color: "white",
+    border: "none",
+    padding: "14px 15px",
+    borderRadius: "8px",
+    fontSize: "15px",
+    cursor: "pointer",
+    width: "100%",
+    fontWeight: "bold",
+  },
+  coordenadasBox: {
+    backgroundColor: "#edf2f7",
+    border: "1px solid #e2e8f0",
+    borderRadius: "8px",
+    padding: "15px",
+    marginTop: "15px",
+    textAlign: "center",
+  },
+  buttonAccion: {
+    color: "white",
+    border: "none",
+    padding: "12px 15px",
+    borderRadius: "6px",
+    fontSize: "15px",
+    cursor: "pointer",
+    width: "100%",
+    fontWeight: "bold",
   },
 };
 
