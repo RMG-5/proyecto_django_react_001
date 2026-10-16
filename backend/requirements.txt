@@ -1,0 +1,14 @@
+# Framework principal del proyecto
+Django==6.1.0
+
+# Librería para permitir peticiones entre diferentes dominios (Django - React)
+django-cors-headers==4.4.0
+
+# Librería para habilitar la API REST
+djangorestframework==3.18.0
+
+# Manejo de variables de entorno (Agregado para leer el archivo .env)
+django-environ==0.14.0
+
+# Conector de base de datos para PostgreSQL
+psycopg[binary]>=3.2.0 # Requiere versión binaria para no compilar en Docker

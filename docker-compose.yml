@@ -1,0 +1,82 @@
+
+# =========================================================================
+# CONFIGURACIÓN GLOBAL DE DOCKER COMPOSE
+# =========================================================================
+services: # Define el inicio del bloque con todos los contenedores de tu aplicación.
+
+  # -----------------------------------------------------------------------
+  # CONTENEDOR DE LA BASE DE DATOS (PostgreSQL)
+  # -----------------------------------------------------------------------
+  db: # Define el nombre del servicio para la base de datos PostgreSQL.
+    image: postgres:18.6 # Descarga la imagen oficial de PostgreSQL v18.6.
+    container_name: checador_db # Asigna el nombre fijo 'checador_db' al contenedor en ejecución.
+    restart: always # Configura el contenedor para reiniciarse automáticamente si falla o si Docker se reinicia.
+    
+    environment: # Inicia la sección de variables de entorno para configurar la base de datos.
+      POSTGRES_DB: checador_db # Crea la base de datos inicial automáticamente con el nombre 'checador_db'.
+      POSTGRES_USER: admin # Define 'admin' como el usuario administrador del sistema.
+      POSTGRES_PASSWORD: adminpass123 # Establece la contraseña de seguridad para el usuario administrador.
+      
+    ports:
+      - "5433:5432" # Mapeo de puertos: Vincula el puerto 5433 externo (tu PC) con el 5432 interno (del contenedor).
+      
+    volumes:
+      - postgres_data:/var/lib/postgresql/18/docker # Guarda los datos en el volumen global para que la información no se borre al apagar Docker.
+
+    healthcheck: # Configura una prueba automatizada para verificar si la base de datos ya está lista.
+      # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+      test: ["CMD-SHELL", "pg_isready -U admin -d checador_db"] # Tus valores originales: Comando de prueba con usuario y base de datos genéricos.
+      # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+      interval: 5s # Ejecuta esta prueba de salud de manera repetida cada 5 segundos.
+      timeout: 5s # Tiempo máximo de espera por una respuesta del comando antes de marcar un intento fallido.
+      retries: 5 # Reintenta hasta 5 veces consecutivas antes de declarar al contenedor oficialmente como "inestable".
+      start_period: 30s 
+
+  # -----------------------------------------------------------------------
+  # CONTENEDOR DEL BACKEND (Django API)
+  # -----------------------------------------------------------------------
+  backend: # Define el servicio para tu servidor o API de desarrollo en Python/Django.
+    build: ./backend # Construye la imagen de Docker leyendo el archivo 'Dockerfile' ubicado dentro de tu carpeta local './backend'.
+    container_name: checador_backend # Nombra al contenedor en ejecución como 'checador_backend'.
+    command: python manage.py runserver 0.0.0.0:8000 # Comando que arranca el servidor de Django escuchando en todas las interfaces de red internas.
+    
+    volumes:
+      - ./backend:/app # Sincroniza en tiempo real tu carpeta local './backend' con '/app' dentro del contenedor.
+      
+    ports:
+      - "8000:8000" # Expone el puerto 8000 del contenedor directamente en tu computadora.
+      
+    environment: # Variables de entorno que inyectan las credenciales y accesos directamente a tu código de Django.
+      - DB_NAME=checador_db # Especifica a qué base de datos debe conectarse el backend.
+      - DB_USER=admin # Usuario con el que Django se autenticará en PostgreSQL.
+      - DB_PASSWORD=adminpass123 # Contraseña con la que Django se autenticará en PostgreSQL.
+      - DB_HOST=db # Dirección de red de la base de datos (Docker asocia el nombre del servicio 'db' como la IP del contenedor).
+      - DB_PORT=5432 # Tu valor original: Puerto de red asignado para buscar la conexión del servicio de base de datos.
+      
+    depends_on: # Controla el orden de arranque de los servicios del proyecto.
+      db: # Depende explícitamente del contenedor 'db'.
+        condition: service_healthy # El backend esperará hasta que el healthcheck de la base de datos se complete.
+
+  # -----------------------------------------------------------------------
+  # CONTENEDOR DEL FRONTEND (Vite / React / Vue / Angular)
+  # -----------------------------------------------------------------------
+  frontend: # Define el servicio para la interfaz gráfica del usuario.
+    build: ./frontend # Construye la imagen usando el archivo 'Dockerfile' que se encuentra dentro de la carpeta local './frontend'.
+    container_name: checador_frontend # Nombra al contenedor en ejecución como 'checador_frontend'.
+    command: npm run dev -- --host # Arranca el servidor de desarrollo de Node.js exponiéndolo abiertamente a la red local del contenedor.
+    
+    volumes:
+      - ./frontend:/app # Sincroniza el código de tu interfaz local para reflejar actualizaciones visuales instantáneas.
+      - /app/node_modules # Volumen anónimo: Protege las librerías instaladas dentro de Docker.
+      
+    ports:
+      - "5173:5173" # Expone el puerto de desarrollo de Vite para que entres desde tu computadora.
+      
+    depends_on:
+      - backend # Asegura el orden lógico de encendido: el frontend esperará a que el contenedor del backend se active antes de arrancar.
+
+# =========================================================================
+# SECCIÓN DE ALMACENAMIENTO PERSISTENTE (VOLÚMENES GLOBALES)
+# =========================================================================
+volumes: # Declara los espacios de disco virtuales administrados de forma global por el motor de Docker.
+  postgres_data: # Define el volumen estructurado asignado a la base de datos para evitar la pérdida de datos.
