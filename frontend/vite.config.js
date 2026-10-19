@@ -1,9 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite"; // <-- 1. Importa Tailwind
 
 // https://vitejs.dev
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    tailwindcss(), // <-- 2. Añade el plugin aquí
+  ],
   server: {
     host: true, // Crucial para que Docker pueda mapear el puerto hacia afuera
     port: 5173,

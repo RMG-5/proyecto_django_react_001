@@ -12,3 +12,6 @@ django-environ==0.14.0
 
 # Conector de base de datos para PostgreSQL
 psycopg[binary]>=3.2.0 # Requiere versión binaria para no compilar en Docker
+
+
+openpyxl==3.1.15

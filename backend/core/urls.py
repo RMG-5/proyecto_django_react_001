@@ -17,7 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include  # Asegúrate de importar include
 # Importamos la vista oficial de DRF para generar tokens
-from rest_framework.authtoken.views import obtain_auth_token 
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
 
 # ===========================================================
 from django.http import HttpResponse # Importamos HttpResponse
@@ -30,12 +32,25 @@ def pagina_bienvenida(request):
 # ===========================================================
 
 
+# Creamos una vista personalizada de Login que hereda de la original de Django
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        # Devolvemos el Token JUNTOS con los datos del rol del usuario
+        return Response({
+            'token': token.key,
+            'is_admin': user.is_staff # True si es administrador, False si no
+        })
+        
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Conectamos nuestra nueva API en la ruta raíz de la API
     path('api/', include('asistencias.urls')),
-    # Nueva ruta para el Login: React enviará usuario y contraseña aquí
-    path('api/login/', obtain_auth_token, name='api_token_auth'),
+    # Cambiamos obtain_auth_token por nuestra nueva vista CustomAuthToken
+    path('api/login/', CustomAuthToken.as_view(), name='api_token_auth'),
 
 # ===========================================================
     # Mapeamos la raíz a la función que acabamos de crear
