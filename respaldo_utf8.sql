@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 3vUv8hFxWSdgJ7NeMjKZnxCyfY5urJFmehJahSqFxO4MNCcpINxqaO0tI6Ypi0Q
+\restrict E8pRBAOqfhm6lmBnXZbOXv9BoXMqDpPn4xDQl2OLgbEo5ehAMjAUbw0Hd36HE7p
 
 -- Dumped from database version 18.6 (Debian 18.6-1.pgdg13+2)
 -- Dumped by pg_dump version 18.6 (Debian 18.6-1.pgdg13+2)
@@ -345,11 +345,17 @@ ALTER TABLE public.django_session OWNER TO admin;
 COPY public.asistencias_registroasistencia (id, fecha_hora, tipo, latitud, longitud, dispositivo, usuario_id) FROM stdin;
 1	2026-10-16 15:49:37.011537+00	ENTRADA	19.700600	-101.185600	\N	2
 2	2026-10-16 15:49:49.768644+00	ENTRADA	19.700600	-101.185600	\N	3
-7	2026-10-16 16:35:13.894541+00	SALIDA	19.702928	-101.117854	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
-8	2026-10-16 16:40:42.369867+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1
-9	2026-10-16 16:42:49.899901+00	ENTRADA	19.702931	-101.117851	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
-10	2026-10-16 16:58:38.962555+00	ENTRADA	19.702929	-101.117851	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
-11	2026-10-16 17:08:18.246873+00	SALIDA	19.702928	-101.117874	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+15	2026-10-16 17:54:59.973582+00	ENTRADA	19.702935	-101.117857	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+16	2026-10-16 17:57:29.789831+00	ENTRADA	19.702933	-101.117849	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+18	2026-10-19 13:29:26.59158+00	ENTRADA	19.702931	-101.117868	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+19	2026-10-19 13:58:02.332299+00	SALIDA	19.702935	-101.117850	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+20	2026-10-19 14:00:21.293659+00	ENTRADA	19.702931	-101.117849	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+24	2026-10-19 14:49:28.5577+00	ENTRADA	19.702926	-101.117847	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+25	2026-10-19 14:50:25.180885+00	ENTRADA	19.702937	-101.117852	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+26	2026-10-19 16:04:42.988457+00	ENTRADA	19.702931	-101.117847	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+27	2026-10-19 17:09:26.142755+00	ENTRADA	19.702914	-101.117915	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	2
+28	2026-10-19 17:10:24.257159+00	ENTRADA	19.702930	-101.117878	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1
+29	2026-10-19 17:55:41.378162+00	ENTRADA	19.702934	-101.117863	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	2
 \.
 
 
@@ -418,9 +424,10 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$1500000$vwtLA23SkNw8PfNazAX60b$038rXKd+Ak65+WrR9s4pkLnOxwp+PAJtezODw3hnMMw=	2026-10-16 15:41:20.479365+00	t	rmg5				t	t	2026-10-16 15:41:00.295195+00
 2	pbkdf2_sha256$1500000$rZKIV7tNk1YyUw2meQZiHc$BPpKw+aaMLUhfCqb66tyI+VwFO99nyTD2DbneeI9ELM=	\N	f	Juan_Perez_001	Juan	Perez	juan.perez.001@checador.mx	f	t	2026-10-16 15:48:27+00
 3	pbkdf2_sha256$1500000$FnCp8BWhBj067mLv8zDuxh$B0TuzQct56EcnC1IfXNV+7vf7kaEIAvoM2EdIp5gABw=	\N	f	Pedro_Chavez_002	Pedro	Chavez	pedro.chavez.002@checador.mx	f	t	2026-10-16 15:49:10+00
+1	pbkdf2_sha256$1500000$vwtLA23SkNw8PfNazAX60b$038rXKd+Ak65+WrR9s4pkLnOxwp+PAJtezODw3hnMMw=	2026-10-16 18:08:57+00	t	rmg5	Ricardo	Garcia	ricardo.garcia@checador.mx	t	t	2026-10-16 15:41:00+00
+4	pbkdf2_sha256$1500000$V4V8Wmle1LbcBLIUqMRZcO$Mlas/V/i1l23KBmlx4/jCnjR38pDfed7Qx8PecXLKRY=	\N	f	Luis_Lopez_003	Luis	Lopez	luis.lopez.003@checagor.mx	t	t	2026-10-20 14:38:08+00
 \.
 
 
@@ -446,6 +453,9 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
 aa7eb994f8359c14755fa2b7afe7a64fff0a4ef2	2026-10-16 15:42:02.908403+00	1
+45f0268ea5890b70f3cab36a74f2b2c4bf371060	2026-10-19 13:55:06.620886+00	2
+1f9e6b7bacfc9e216da9bb909f78bead7d2f2218	2026-10-19 13:55:12.07945+00	3
+380be957d64bf1e46a22481148f1b8ff66707646	2026-10-20 14:39:48.488494+00	4
 \.
 
 
@@ -466,6 +476,24 @@ COPY public.django_admin_log (id, action_time, object_id, object_repr, action_fl
 10	2026-10-16 16:43:07.535454+00	5	rmg5 - ENTRADA - 16/10/2026 16:32	3		9	1
 11	2026-10-16 16:43:07.535482+00	4	rmg5 - ENTRADA - 16/10/2026 16:32	3		9	1
 12	2026-10-16 16:43:07.535505+00	3	rmg5 - SALIDA - 16/10/2026 15:49	3		9	1
+13	2026-10-16 17:31:05.15053+00	11	rmg5 - SALIDA - 16/10/2026 17:08	3		9	1
+14	2026-10-16 17:31:05.15057+00	10	rmg5 - ENTRADA - 16/10/2026 16:58	3		9	1
+15	2026-10-16 17:31:05.150594+00	9	rmg5 - ENTRADA - 16/10/2026 16:42	3		9	1
+16	2026-10-16 17:31:05.150613+00	8	rmg5 - SALIDA - 16/10/2026 16:40	3		9	1
+17	2026-10-16 18:09:40.433682+00	17	rmg5 - ENTRADA - 16/10/2026 18:02	3		9	1
+18	2026-10-19 13:55:06.621474+00	2	45f0268ea5890b70f3cab36a74f2b2c4bf371060	1	[{"added": {}}]	8	1
+19	2026-10-19 13:55:12.07991+00	3	1f9e6b7bacfc9e216da9bb909f78bead7d2f2218	1	[{"added": {}}]	8	1
+20	2026-10-19 13:55:58.761648+00	14	rmg5 - SALIDA - 16/10/2026 17:31	3		9	1
+21	2026-10-19 13:55:58.76169+00	13	rmg5 - ENTRADA - 16/10/2026 17:21	3		9	1
+22	2026-10-19 13:55:58.761715+00	12	rmg5 - SALIDA - 16/10/2026 17:15	3		9	1
+23	2026-10-19 13:55:58.761736+00	7	rmg5 - SALIDA - 16/10/2026 16:35	3		9	1
+24	2026-10-19 14:41:45.450381+00	23	rmg5 - ENTRADA - 19/10/2026 14:38	3		9	1
+25	2026-10-19 14:41:45.450428+00	22	rmg5 - SALIDA - 19/10/2026 14:35	3		9	1
+26	2026-10-19 14:41:45.450454+00	21	rmg5 - ENTRADA - 19/10/2026 14:32	3		9	1
+27	2026-10-20 13:46:43.515205+00	1	rmg5	2	[{"changed": {"fields": ["First name", "Last name", "Email address", "Last login"]}}]	4	1
+28	2026-10-20 13:47:01.126956+00	1	rmg5	2	[{"changed": {"fields": ["Last login"]}}]	4	1
+29	2026-10-20 14:38:09.619252+00	4	Luis_Lopez_003	1	[{"added": {}}]	4	1
+30	2026-10-20 14:38:50.705823+00	4	Luis_Lopez_003	2	[{"changed": {"fields": ["First name", "Last name", "Email address", "Staff status"]}}]	4	1
 \.
 
 
@@ -522,7 +550,8 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
-mqznwnies5brandtu9jllvhe5g4bcuuk	.eJxVjDsOwjAQBe_iGlneJLZ3Kek5g7X-4QCypTipEHeHSCmgfTPzXsLxtha39bS4OYqzAHH63TyHR6o7iHeutyZDq-sye7kr8qBdXltMz8vh_h0U7uVbZ6uIE1OwOWMeRzSocGKPkawfI0wDagSdgtcAA2jQFtGQYVLMlIN4fwDeFzdi:1xHk3c:AhSdIwt76P3631z-sCKqwiGcHJ8IUBdoiL2LWGQVJMA	2026-10-30 15:41:20.482502+00
+uen1odcc1umpid4zrhd2aluupvpbbpcn	.eJxVjDsOwjAQBe_iGlneJLZ3Kek5g7X-4QCypTipEHeHSCmgfTPzXsLxtha39bS4OYqzAHH63TyHR6o7iHeutyZDq-sye7kr8qBdXltMz8vh_h0U7uVbZ6uIE1OwOWMeRzSocGKPkawfI0wDagSdgtcAA2jQFtGQYVLMlIN4fwDeFzdi:1xHlXK:Vm16sDvejOv2wzO4KdKorAisfT22Bg2xmuUW83cKAoo	2026-10-30 17:16:06.447085+00
+tcrwbt4w7zxy1p4fp6z2wms4hkdb1dxw	.eJxVjDsOwjAQBe_iGlneJLZ3Kek5g7X-4QCypTipEHeHSCmgfTPzXsLxtha39bS4OYqzAHH63TyHR6o7iHeutyZDq-sye7kr8qBdXltMz8vh_h0U7uVbZ6uIE1OwOWMeRzSocGKPkawfI0wDagSdgtcAA2jQFtGQYVLMlIN4fwDeFzdi:1xHmMT:uLemGyGYAQFWlnITx6gX3clnlGsqj0hi5nyYBgq914A	2026-10-30 18:08:57.521155+00
 \.
 
 
@@ -530,7 +559,7 @@ mqznwnies5brandtu9jllvhe5g4bcuuk	.eJxVjDsOwjAQBe_iGlneJLZ3Kek5g7X-4QCypTipEHeHSC
 -- Name: asistencias_registroasistencia_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 11, true);
+SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 29, true);
 
 
 --
@@ -565,7 +594,7 @@ SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.auth_user_id_seq', 3, true);
+SELECT pg_catalog.setval('public.auth_user_id_seq', 4, true);
 
 
 --
@@ -579,7 +608,7 @@ SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.django_admin_log_id_seq', 12, true);
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 30, true);
 
 
 --
@@ -953,5 +982,5 @@ ALTER TABLE ONLY public.django_admin_log
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 3vUv8hFxWSdgJ7NeMjKZnxCyfY5urJFmehJahSqFxO4MNCcpINxqaO0tI6Ypi0Q
+\unrestrict E8pRBAOqfhm6lmBnXZbOXv9BoXMqDpPn4xDQl2OLgbEo5ehAMjAUbw0Hd36HE7p
 

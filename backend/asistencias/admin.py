@@ -11,7 +11,7 @@ from django.utils.html import format_html
 @admin.register(RegistroAsistencia)
 class RegistroAsistenciaAdmin(admin.ModelAdmin):
     # Columnas que se mostrarán en la lista general de registros
-    list_display = ('usuario', 'tipo', 'fecha_hora', 'latitud', 'longitud', 'coordenadas_click')
+    list_display = ('id', 'usuario', 'tipo', 'fecha_hora', 'latitud', 'longitud', 'coordenadas_click')
 
     # Filtros laterales para buscar rápidamente por tipo o usuario
     list_filter = ('tipo', 'usuario', 'fecha_hora')

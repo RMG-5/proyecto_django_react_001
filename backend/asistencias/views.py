@@ -1,23 +1,21 @@
 import math
 from rest_framework import viewsets
-from rest_framework.exceptions import ValidationError # Para arrojar errores limpios a React
-# Importamos la clase que obliga a estar autenticado
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated 
-# Importamos el modelo y el traductor que acabamos de hacer
 from .models import RegistroAsistencia
 from .serializers import RegistroAsistenciaSerializer
-# 1. AGREGA ESTAS IMPORTACIONES AL INICIO DE views.py
 from django.http import HttpResponse
 from openpyxl import Workbook
-from rest_framework.decorators import action # Permite crear rutas personalizadas
-from rest_framework.response import Response # <<< ¡ESTA ES LA LÍNEA QUE HACÍA FALTA!
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.utils import timezone
+from datetime import timedelta
 
 
 # --- CONFIGURACIÓN DE LA GEOCERCA (Oficina Central) ---
-# Puedes cambiar estas coordenadas por las de tu casa u oficina real para probar
 OFICINA_LAT = 19.7028
 OFICINA_LON = -101.1177
-RADIO_MAXIMO_METROS = 50.0 # Distancia máxima permitida para checar
+RADIO_MAXIMO_METROS = 50.0
 
 # --- FÓRMULA DE HAVERSINE ---
 def calcular_distancia_metros(lat1, lon1, lat2, lon2):
@@ -42,76 +40,70 @@ def calcular_distancia_metros(lat1, lon1, lat2, lon2):
 
 
 class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
-    # 1. Le decimos a Django de dónde sacar los datos de la base de datos
-    # queryset = RegistroAsistencia.objects.all()
-
-    # 2. Le asignamos su traductor correspondiente
     serializer_class = RegistroAsistenciaSerializer
 
-    # 3. NOTA IMPORTANTE PARA EL APRENDIZAJE:
-    # Por ahora dejamos abierta la API para que puedas hacer pruebas sin meterte
-    # en problemas de autenticación o tokens de sesión. En el futuro, aquí
-    # bloquearemos el endpoint para que solo usuarios logueados puedan checar.
-    # EL SIGUIENTE CODIGO INVALIDA ESTOS COMENTARIOS.
-
-    # Bloqueo de seguridad: Si no envían un token válido, la API responderá "401 Unauthorized"
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Filtrado inteligente según el rol del usuario autenticado
-        """
         user = self.request.user
         
-        # Si el usuario es administrador (staff), le damos acceso a TODO el historial
         if user.is_staff:
-            return RegistroAsistencia.objects.all()
-        
-        # Si es un empleado normal, la API SOLO le devolverá sus propios registros
-        return RegistroAsistencia.objects.filter(usuario=user)
+            queryset = RegistroAsistencia.objects.all()
+        else:
+            queryset = RegistroAsistencia.objects.filter(usuario=user)
 
-    # 2. AGREGA ESTE MÉTODO DENTRO DE LA CLASE RegistroAsistenciaViewSet
+        # --- FILTRADO POR RANGO DE FECHAS (Ya lo tenías) ---
+        fecha_inicio_param = self.request.query_params.get('fecha_inicio')
+        fecha_fin_param = self.request.query_params.get('fecha_fin')
+
+        if fecha_inicio_param and fecha_fin_param:
+            # CORRECCIÓN: Forzamos a que la fecha_fin abarque las 24 horas completas de ese día
+            # Pasará de: "2026-10-10" a: "2026-10-10 23:59:59.999999"
+            fecha_fin_completa = f"{fecha_fin_param}T23:59:59.999999"
+            queryset = queryset.filter(fecha_hora__range=[fecha_inicio_param, fecha_fin_completa])
+        else:
+            fecha_hoy = timezone.now()
+            hace_una_semana = fecha_hoy - timedelta(days=7)
+            queryset = queryset.filter(fecha_hora__range=[hace_una_semana, fecha_hoy])
+
+        # --- NUEVO: FILTRADO POR EMPLEADO ESPECÍFICO ---
+        usuario_id_param = self.request.query_params.get('usuario_id')
+        if usuario_id_param and usuario_id_param != "TODOS" and user.is_staff:
+            # CAMBIO: Agregamos '__username' para buscar por el texto del nombre en lugar del ID numérico
+            queryset = queryset.filter(usuario__username=usuario_id_param)
+
+        return queryset.order_by('-fecha_hora')
+
+
     @action(detail=False, methods=['get'], url_path='exportar-excel')
     def exportar_excel(self, request):
-        """
-        Genera y descarga un archivo Excel con el reporte de asistencias
-        """
-        # Seguridad: Solo los administradores (staff) pueden descargar este reporte
         if not request.user.is_staff:
             return Response({"error": "No autorizado"}, status=403)
 
-        # Creamos un libro de Excel en memoria
         wb = Workbook()
         ws = wb.active
-        ws.title = "Reporte Quincenal"
+        ws.title = "Reporte Filtrado"
 
-        # Definimos los títulos de las columnas (Cabecera)
         cabeceras = ["ID", "Empleado", "Fecha y Hora", "Tipo de Evento", "Latitud", "Longitud", "Dispositivo"]
         ws.append(cabeceras)
 
-        # Traemos todas las asistencias registradas en PostgreSQL
-        asistencias = RegistroAsistencia.objects.all().order_by('-fecha_hora')
+        # --- SOLUCIÓN: Aplica los filtros activos del request al QuerySet ---
+        queryset = self.get_queryset()
+        asistencias = self.filter_queryset(queryset) 
 
-        # Recorremos los registros y los escribimos fila por fila en el Excel
         for asis in asistencias:
             ws.append([
                 asis.id,
-                asis.usuario.username,
-                asis.fecha_hora.strftime("%d/%m/%Y %H:%M:%S"), # Fecha formateada legible
+                asis.usuario.username,  # Asegúrate de que tu modelo tenga la relación 'usuario'
+                asis.fecha_hora.strftime("%d/%m/%Y %H:%M:%S"),
                 asis.tipo,
-                float(asis.latitud),
-                float(asis.longitud),
+                float(asis.latitud) if asis.latitud else 0.0,   # Previene errores si viene vacío
+                float(asis.longitud) if asis.longitud else 0.0, # Previene errores si viene vacío
                 asis.dispositivo or "Desconocido"
             ])
 
-        # Preparamos la respuesta HTTP configurando el tipo de archivo correcto (MIME Type)
-        response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        # Le indicamos al navegador que es un archivo descargable llamado 'reporte_asistencias.xlsx'
-        response['Content-Disposition'] = 'attachment; filename="reporte_asistencias.xlsx"'
-        
-        # Guardamos el libro de Excel directamente en la respuesta del servidor
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="reporte_asistencias_filtrado.xlsx"'
         wb.save(response)
         return response
 

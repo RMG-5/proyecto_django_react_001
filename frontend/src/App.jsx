@@ -35,6 +35,10 @@ function App() {
   // --- NUEVOS ESTADOS PARA EL DASHBOARD ADMINISTRADOR ---
   const [vistaAdmin, setVistaAdmin] = useState(false); // Alternar entre empleado y admin
   const [historialAsistencias, setHistorialAsistencias] = useState([]); // Guarda los registros de la API
+  const [usuariosFiltro, setUsuariosFiltro] = useState([]);
+  const [fechaInicio, setFechaInicio] = useState("");
+  const [fechaFin, setFechaFin] = useState("");
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState("TODOS");
 
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -52,19 +56,36 @@ function App() {
   useEffect(() => {
     if (vistaAdmin && isLoggedIn) {
       const token = localStorage.getItem("user_token");
+      // Creamos un objeto de configuración para Axios
+      const config = {
+        headers: { Authorization: `Token ${token}` },
+        params: {}, // Aquí viajan los Query Parameters automáticamente
+      };
+
+      // Si ambas fechas están seleccionadas en el HTML, las inyectamos a la petición
+      if (fechaInicio && fechaFin) {
+        config.params.fecha_inicio = fechaInicio;
+        config.params.fecha_fin = fechaFin;
+      }
+      // INYECTAMOS EL FILTRO DE USUARIO HACIA LA API DE DJANGO
+      if (usuarioSeleccionado) {
+        config.params.usuario_id = usuarioSeleccionado;
+      }
       axios
-        .get(`${import.meta.env.VITE_API_URL}/api/asistencias/`, {
-          headers: { Authorization: `Token ${token}` },
-        })
+        .get(`${import.meta.env.VITE_API_URL}/api/asistencias/`, config)
         .then((response) => {
+          // Guardamos el historial filtrado para el mapa
           setHistorialAsistencias(response.data);
+
+          // NUEVO: Si nuestra lista fija de usuarios está vacía (es la primera carga), la llenamos
+          // Esto evita que los usuarios desaparezcan cuando la API se filtre
+          if (usuariosFiltro.length === 0) {
+            setUsuariosFiltro(response.data);
+          }
         })
-        .catch((err) => {
-          console.error("Error al traer historial:", err);
-          alert("No se pudo cargar el historial.");
-        });
+        .catch((err) => console.error("Error al filtrar historial:", err));
     }
-  }, [vistaAdmin, isLoggedIn]);
+  }, [vistaAdmin, isLoggedIn, fechaInicio, fechaFin, usuarioSeleccionado]);
 
   // Capturar coordenadas reales del GPS
   const obtenerUbicacion = () => {
@@ -185,23 +206,31 @@ function App() {
         {
           headers: { Authorization: `Token ${token}` },
           responseType: "blob",
+          // Agregamos los mismos parámetros activos para que Django filtre el archivo Excel
+          params: {
+            fecha_inicio: fechaInicio,
+            fecha_fin: fechaFin,
+            usuario_id: usuarioSeleccionado?.id || usuarioSeleccionado,
+          },
         },
       );
 
-      // Creamos un enlace temporal invisible en el navegador para forzar la descarga física
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", "reporte_asistencias_quincenal.xlsx");
+      link.setAttribute("download", "reporte_filtrado.xlsx");
       document.body.appendChild(link);
       link.click();
-
-      // Limpiamos el enlace de la memoria del navegador
       link.parentNode.removeChild(link);
     } catch (err) {
-      console.error("Error al descargar Excel:", err);
-      alert("No se pudo descargar el reporte.");
+      console.error(err);
     }
+  };
+
+  const limpiarFiltros = () => {
+    setFechaInicio("");
+    setFechaFin("");
+    setUsuarioSeleccionado("TODOS");
   };
 
   // ************************************* //
@@ -209,6 +238,12 @@ function App() {
     // 1. Borramos el almacenamiento físico del navegador
     localStorage.removeItem("user_token");
     localStorage.removeItem("is_admin");
+
+    setFechaInicio("");
+    setFechaFin("");
+    if (typeof setUsuarioSeleccionado === "function") {
+      setUsuarioSeleccionado("TODOS");
+    }
 
     // 2. Reseteamos los estados de autenticación y rol
     setIsLoggedIn(false);
@@ -223,6 +258,7 @@ function App() {
     setLongitud(null);
     setMensajeExito("");
     setErrorGps("");
+    setUsuariosFiltro([]);
   };
 
   return (
@@ -233,7 +269,7 @@ function App() {
             <span className="animate-bounce">📍</span> Sistema Checador GPS
           </h1>
           <p className="text-sm font-medium text-slate-500 mt-1">
-            Docker + Django + React Enterprise Solution
+            Solución: Docker + Django + React
           </p>
         </header>
 
@@ -246,7 +282,7 @@ function App() {
               </span>
               <button
                 onClick={handleLogout}
-                className="text-xs font-bold text-red-500 hover:text-red-700 transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-5 rounded-lg shadow-md active:scale-95 transition-all flex items-center gap-1"
               >
                 Cerrar Sesión
               </button>
@@ -255,13 +291,13 @@ function App() {
             {isAdmin && (
               <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
                 <button
-                  className={`flex-1 text-center py-2 text-sm font-bold rounded-lg transition-all ${!vistaAdmin ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                  className={`flex-1 text-center py-2 text-sm font-bold rounded-lg transition-all ${!vistaAdmin ? "text-blue-600 shadow-md" : "text-slate-600 hover:text-slate-900"}`}
                   onClick={() => setVistaAdmin(false)}
                 >
                   📱 Empleado
                 </button>
                 <button
-                  className={`flex-1 text-center py-2 text-sm font-bold rounded-lg transition-all ${vistaAdmin ? "bg-white text-blue-600 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                  className={`flex-1 text-center py-2 text-sm font-bold rounded-lg transition-all ${vistaAdmin ? "text-blue-600 shadow-md" : "text-slate-600 hover:text-slate-900"}`}
                   onClick={() => setVistaAdmin(true)}
                 >
                   📊 Administrador
@@ -306,7 +342,7 @@ function App() {
                           <Popup>Tú estás aquí</Popup>
                         </Marker>
                         <Circle
-                          center={[19.7006, -101.1856]}
+                          center={[19.7028, -101.1177]}
                           radius={50}
                           pathOptions={{
                             color: "#10b981",
@@ -347,25 +383,91 @@ function App() {
                       Ubicaciones exactas recopiladas.
                     </p>
                   </div>
-
-                  {/* --- NUEVO BOTÓN DE EXCEL ESTILIZADO CON TAILWIND --- */}
                   <button
                     onClick={descargarExcel}
                     className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3 rounded-lg shadow-md active:scale-95 transition-all flex items-center gap-1"
                   >
-                    🟢 Descargar Excel
+                    Importar Excel
                   </button>
+                </div>
+
+                {/* --- NUEVO: SELECTORES DE FECHA MINIMALISTAS --- */}
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 space-y-3 text-left">
+                  {/* Fila de Calendarios */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                        Desde:
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full bg-white border border-slate-200 rounded-lg p-1.5 text-xs font-semibold text-slate-700"
+                        value={fechaInicio}
+                        onChange={(e) => setFechaInicio(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                        Hasta:
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full bg-white border border-slate-200 rounded-lg p-1.5 text-xs font-semibold text-slate-700"
+                        value={fechaFin}
+                        onChange={(e) => setFechaFin(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* --- NUEVO: MENÚ DESPLEGABLE DE EMPLEADOS --- */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                      Filtrar por Empleado:
+                    </label>
+                    <select
+                      className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400"
+                      value={usuarioSeleccionado}
+                      onChange={(e) => setUsuarioSeleccionado(e.target.value)}
+                    >
+                      <option value="TODOS">
+                        👥 Mostrar Todos los Empleados
+                      </option>
+
+                      {/* CAMBIO CLAVE: Recorremos 'usuariosFiltro' para mantener el menú siempre intacto */}
+                      {Array.from(
+                        new Map(
+                          usuariosFiltro.map((item) => [
+                            item.usuario_nombre,
+                            item,
+                          ]),
+                        ).values(),
+                      ).map((asis) => (
+                        <option key={asis.id} value={asis.usuario_nombre}>
+                          👤 {asis.usuario_nombre}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={limpiarFiltros}
+                      className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg p-2 transition-colors"
+                    >
+                      🧹 Limpiar Filtros
+                    </button>
+                  </div>
                 </div>
 
                 <div className="h-72 w-full rounded-xl overflow-hidden border border-slate-200 relative z-0">
                   <MapContainer
-                    center={[19.7006, -101.1856]}
+                    center={[19.7028, -101.1177]}
                     zoom={14}
                     style={{ height: "100%", width: "100%" }}
                   >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                     <Circle
-                      center={[19.7006, -101.1856]}
+                      center={[19.7028, -101.1177]}
                       radius={50}
                       pathOptions={{
                         color: "#10b981",
@@ -431,7 +533,7 @@ function App() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  placeholder="admin"
+                  placeholder="nombre usuario"
                 />
               </div>
               <div>
