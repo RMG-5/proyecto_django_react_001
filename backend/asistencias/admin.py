@@ -6,12 +6,32 @@
 from django.contrib import admin
 
 # Se importa nuestro modelo 'RegistroAsistencia' para poder darle una interfaz visual.
-from .models import RegistroAsistencia
+from .models import Sucursal, RegistroAsistencia
 
 # Se importa 'format_html' de Django. Es una función de seguridad fundamental que permite
 # renderizar etiquetas HTML de forma segura en el admin, evitando ataques de inyección de código (XSS).
 from django.utils.html import format_html
 
+
+@admin.register(Sucursal)
+class SucursalAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nombre', 'latitud', 'longitud', 'radio_maximo_metros')
+    search_fields = ('nombre',)
+
+    class Media:
+        # 1. Cargamos los estilos CSS de Leaflet desde su CDN oficial
+        css = {
+            'all': ('https://unpkg.com/leaflet/dist/leaflet.css',)
+        }
+        # 2. Cargamos primero la librería Leaflet y luego tu script personalizado
+        js = (
+            'https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.js',
+            'asistencias/js/mapa_admin.js',
+        )
+    
+
+# Registramos el modelo de asistencias (mantiene los buscadores tradicionales)
+# admin.site.register(RegistroAsistencia)
 
 # ==============================================================================
 # CONFIGURACIÓN DEL PANEL DE ADMINISTRACIÓN (ADMIN MODEL)
@@ -28,8 +48,7 @@ class RegistroAsistenciaAdmin(admin.ModelAdmin):
         'usuario', 
         'tipo', 
         'fecha_hora', 
-        'latitud', 
-        'longitud', 
+        'sucursal',
         'coordenadas_click'
     )
 

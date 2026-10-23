@@ -9,6 +9,28 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Sucursal(models.Model):
+    """
+    Modelo para registrar dinámicamente las oficinas del sistema con su propia geocerca.
+    """
+    nombre = models.CharField(max_length=250, unique=True, verbose_name="Nombre de la Sucursal")
+    
+    # Coordenadas geográficas del centro de esta sucursal específica
+    latitud = models.DecimalField(max_digits=9, decimal_places=6)
+    longitud = models.DecimalField(max_digits=9, decimal_places=6)
+    
+    # Permite que cada oficina tenga una tolerancia en metros distinta (ej. matriz 50m, bodega 100m)
+    radio_maximo_metros = models.DecimalField(max_digits=5, decimal_places=1, default=50.0)
+
+    class Meta:
+        verbose_name = "Sucursal"
+        verbose_name_plural = "Sucursales"
+        ordering = ['nombre']
+
+    def __str__(self):
+        return f"{self.nombre} (Radio: {self.radio_maximo_metros}m)"
+    
+
 # ==============================================================================
 # MODELO: REGISTRO DE ASISTENCIA
 # ==============================================================================
@@ -51,6 +73,8 @@ class RegistroAsistencia(models.Model):
     # - null=True: Permite que el campo guarde un valor nulo (NULL) directamente en la base de datos si no se detecta el dispositivo.
     dispositivo = models.CharField(max_length=255, blank=True, null=True)
 
+    # NUEVO CAMPO: Vincula de forma obligatoria la asistencia con la sucursal elegida
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT, related_name='registros_asistencia')
 
     # ==========================================================================
     # CONFIGURACIÓN INTERNA (METADATOS)
@@ -77,5 +101,5 @@ class RegistroAsistencia(models.Model):
     # Es el texto que verás listado en el panel de administración o al imprimir el objeto en consola.
     def __str__(self):
         # Retorna un texto formateado que incluye el nombre del usuario, el tipo (Entrada/Salida) y la fecha formateada (Día/Mes/Año Hora:Minuto).
-        return f"{self.usuario.username} - {self.tipo} - {self.fecha_hora.strftime('%d/%m/%Y %H:%M')}"
+        return f"{self.usuario.username} - {self.tipo} - {self.sucursal.nombre}"
     

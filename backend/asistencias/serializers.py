@@ -7,8 +7,22 @@
 from rest_framework import serializers
 
 # Se importa el modelo 'RegistroAsistencia' que definimos previamente en el archivo 'models.py'.
-from .models import RegistroAsistencia
+from .models import Sucursal, RegistroAsistencia
 
+
+class SucursalSerializer(serializers.ModelSerializer):
+
+    class Meta:
+            
+            model = Sucursal
+            
+            fields = [
+                'id',
+                'nombre', 
+                'latitud', 
+                'longitud', 
+                'radio_maximo_metros'
+            ]
 
 # ==============================================================================
 # SERIALIZADOR: REGISTRO DE ASISTENCIA
@@ -43,7 +57,8 @@ class RegistroAsistenciaSerializer(serializers.ModelSerializer):
             'tipo', 
             'latitud', 
             'longitud', 
-            'dispositivo'
+            'dispositivo',
+            'sucursal'
         ]
         
         # Lista de campos que son estrictamente de "Solo Lectura".

@@ -34,53 +34,58 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 let DefaultIcon = L.icon({
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
-  iconSize: [25, 41],     // Dimensiones del marcador físico (ancho y alto).
-  iconAnchor: [12, 41],   // Punto exacto del icono que se alineará con la coordenada GPS real (la punta inferior).
+  iconSize: [25, 41], // Dimensiones del marcador físico (ancho y alto).
+  iconAnchor: [12, 41], // Punto exacto del icono que se alineará con la coordenada GPS real (la punta inferior).
 });
 
 // Reemplazamos la configuración global de marcadores de Leaflet por nuestro icono corregido.
 L.Marker.prototype.options.icon = DefaultIcon;
 
-
 // ==============================================================================
 // 3. COMPONENTE PRINCIPAL: APP
 // ==============================================================================
 function App() {
-
   // ----------------------------------------------------------------------------
   // ESTADOS DE AUTENTICACIÓN (LOGIN)
   // ----------------------------------------------------------------------------
-  const [isLoggedIn, setIsLoggedIn] = useState(false);  // Bandera booleana: true si el usuario inició sesión.
-  const [username, setUsername] = useState("");          // Almacena el texto escrito en el input de usuario.
-  const [password, setPassword] = useState("");          // Almacena el texto escrito en el input de contraseña.
-  const [error, setError] = useState("");                // Controla los mensajes de error en pantalla al fallar el login.
-  const [loading, setLoading] = useState(false);        // Bandera de carga para deshabilitar botones mientras se procesa el login.
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Bandera booleana: true si el usuario inició sesión.
+  const [username, setUsername] = useState(""); // Almacena el texto escrito en el input de usuario.
+  const [password, setPassword] = useState(""); // Almacena el texto escrito en el input de contraseña.
+  const [error, setError] = useState(""); // Controla los mensajes de error en pantalla al fallar el login.
+  const [loading, setLoading] = useState(false); // Bandera de carga para deshabilitar botones mientras se procesa el login.
 
   // ----------------------------------------------------------------------------
   // ESTADOS DE UBICACIÓN GPS
   // ----------------------------------------------------------------------------
-  const [latitud, setLatitud] = useState(null);          // Guarda la latitud obtenida por el GPS del navegador.
-  const [longitud, setLongitud] = useState(null);        // Guarda la longitud obtenida por el GPS del navegador.
+  const [latitud, setLatitud] = useState(null); // Guarda la latitud obtenida por el GPS del navegador.
+  const [longitud, setLongitud] = useState(null); // Guarda la longitud obtenida por el GPS del navegador.
   const [cargandoGps, setCargandoGps] = useState(false); // true si el navegador está intentando triangular la señal GPS.
-  const [errorGps, setErrorGps] = useState("");          // Almacena errores si el usuario deniega los permisos de ubicación o falla la señal.
+  const [errorGps, setErrorGps] = useState(""); // Almacena errores si el usuario deniega los permisos de ubicación o falla la señal.
 
   // ----------------------------------------------------------------------------
   // ESTADOS DE ACCIÓN (MARCAJE DE ASISTENCIA)
   // ----------------------------------------------------------------------------
   const [enviandoRegistro, setEnviandoRegistro] = useState(false); // true si se está ejecutando la llamada POST de asistencia.
-  const [mensajeExito, setMensajeExito] = useState("");            // Guarda el mensaje alegre de confirmación cuando la checada fue válida.
+  const [mensajeExito, setMensajeExito] = useState(""); // Guarda el mensaje alegre de confirmación cuando la checada fue válida.
 
   // ----------------------------------------------------------------------------
   // ESTADOS DE PANEL DE ADMINISTRACIÓN Y FILTROS
   // ----------------------------------------------------------------------------
-  const [vistaAdmin, setVistaAdmin] = useState(false);               // Controla si en pantalla se visualiza la sección de reportes.
+  const [vistaAdmin, setVistaAdmin] = useState(false); // Controla si en pantalla se visualiza la sección de reportes.
   const [historialAsistencias, setHistorialAsistencias] = useState([]); // Arreglo que almacena los registros JSON devueltos por el servidor.
-  const [usuariosFiltro, setUsuariosFiltro] = useState([]);          // Guarda una lista limpia de usuarios para el selector del buscador.
-  const [fechaInicio, setFechaInicio] = useState("");                // Filtro: Fecha de arranque elegida en el calendario.
-  const [fechaFin, setFechaFin] = useState("");                      // Filtro: Fecha de cierre elegida en el calendario.
+  const [usuariosFiltro, setUsuariosFiltro] = useState([]); // Guarda una lista limpia de usuarios para el selector del buscador.
+  const [fechaInicio, setFechaInicio] = useState(""); // Filtro: Fecha de arranque elegida en el calendario.
+  const [fechaFin, setFechaFin] = useState(""); // Filtro: Fecha de cierre elegida en el calendario.
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState("TODOS"); // Filtro: Empleado específico seleccionado para el reporte.
 
-  const [isAdmin, setIsAdmin] = useState(false);                     // Bandera booleana que define si el usuario logueado es Administrador.
+  const [isAdmin, setIsAdmin] = useState(false); // Bandera booleana que define si el usuario logueado es Administrador.
+
+  // Almacena el arreglo de sucursales devuelto por el servidor de Django
+  const [sucursales, setSucursales] = useState([]);
+
+  // Guarda el objeto completo de la sucursal que el empleado elija en el selector
+  const [sucursalSeleccionadaEmpleado, setSucursalSeleccionadaEmpleado] =
+    useState(null);
 
   // ==============================================================================
   // 4. EFECTOS DE CONTROL (USEEFFECT)
@@ -99,7 +104,6 @@ function App() {
       setIsAdmin(adminSaved);
     }
   }, []); // El arreglo vacío [] asegura que este bloque solo se ejecute al montar el componente.
-
 
   // EFECTO 2: Carga y Filtrado Dinámico de Historial de Asistencias (Modo Administrador)
   useEffect(() => {
@@ -141,6 +145,29 @@ function App() {
     // Este efecto se volverá a ejecutar automáticamente cada vez que cambie cualquiera de estas variables:
   }, [vistaAdmin, isLoggedIn, fechaInicio, fechaFin, usuarioSeleccionado]);
 
+  // EFECTO NUEVO: Descarga el catálogo de sucursales activas al iniciar sesión
+  useEffect(() => {
+    if (isLoggedIn) {
+      const token = localStorage.getItem("user_token");
+
+      // Hacemos una petición GET al endpoint que expone tus sucursales creadas en el admin
+      axios
+        .get(`${import.meta.env.VITE_API_URL}/api/sucursales/`, {
+          headers: { Authorization: `Token ${token}` },
+        })
+        .then((response) => {
+          setSucursales(response.data);
+
+          // Selecciona automáticamente la primera sucursal de la lista por comodidad visual
+          if (response.data.length > 0) {
+            setSucursalSeleccionadaEmpleado(response.data[0]);
+          }
+        })
+        .catch((err) =>
+          console.error("Error al cargar el catálogo de obras:", err),
+        );
+    }
+  }, [isLoggedIn]); // Se dispara inmediatamente cuando el usuario se loguea con éxito
 
   // ==============================================================================
   // 5. FUNCIONES DE ACCIÓN Y LÓGICA DE NEGOCIO
@@ -162,9 +189,9 @@ function App() {
     navigator.geolocation.getCurrentPosition(
       // Caso de Éxito: El usuario aceptó los permisos y el satélite/red obtuvo la ubicación.
       (position) => {
-        setLatitud(position.coords.latitude);   // Guarda la latitud decimal.
+        setLatitud(position.coords.latitude); // Guarda la latitud decimal.
         setLongitud(position.coords.longitude); // Guarda la longitud decimal.
-        setCargandoGps(false);                  // Apaga el indicador de carga del GPS.
+        setCargandoGps(false); // Apaga el indicador de carga del GPS.
       },
       // Caso de Error: El usuario rechazó el permiso de GPS o el dispositivo tardó mucho en responder.
       (error) => {
@@ -180,12 +207,11 @@ function App() {
     );
   };
 
-
   // FUNCIÓN: Envío del formulario de Login hacia el Backend
   const handleLogin = async (e) => {
     e.preventDefault(); // Cancela el refresco automático de página por defecto de los formularios HTML.
     setError("");
-    setLoading(true);   // Bloquea el botón para evitar clics repetidos.
+    setLoading(true); // Bloquea el botón para evitar clics repetidos.
     try {
       // Envía una petición POST con las credenciales ingresadas al endpoint de login.
       const response = await axios.post(
@@ -213,7 +239,6 @@ function App() {
     }
   };
 
-
   // FUNCIÓN: Registrar Entrada o Salida enviando las coordenadas a la Geocerca de Django
   const registrarAsistencia = async (tipoEvento) => {
     setEnviandoRegistro(true); // Muestra un spinner de carga en el botón de checar.
@@ -233,6 +258,7 @@ function App() {
           longitud: parseFloat(longitud).toFixed(6),
           // Envía una cadena identificadora del navegador y sistema del usuario recortada a 100 caracteres.
           dispositivo: navigator.userAgent.substring(0, 100),
+          sucursal: sucursalSeleccionadaEmpleado.id,
         },
         {
           // Adjunta las cabeceras de autorización con el token del empleado.
@@ -242,9 +268,9 @@ function App() {
         },
       );
 
-      // Si pasa la validación de la geocerca de Django, despliega el mensaje de éxito en pantalla.
-      setMensajeExito(`¡Checada de ${tipoEvento} registrada correctamente!`);
-      // Limpia las variables de coordenadas para obligar al usuario a recalcular su ubicación en su siguiente checada.
+      setMensajeExito(
+        `¡Checada de ${tipoEvento} registrada correctamente en ${sucursalSeleccionadaEmpleado.nombre}!`,
+      );
       setLatitud(null);
       setLongitud(null);
     } catch (err) {
@@ -268,7 +294,6 @@ function App() {
       setEnviandoRegistro(false); // Apaga el estado de carga del botón.
     }
   };
-
 
   // FUNCIÓN: Descarga del Reporte de Excel binario aplicando los filtros de pantalla
   const descargarExcel = async () => {
@@ -310,14 +335,12 @@ function App() {
     }
   };
 
-
   // FUNCIÓN: Limpiador de los filtros activos en los selectores del administrador
   const limpiarFiltros = () => {
     setFechaInicio("");
     setFechaFin("");
     setUsuarioSeleccionado("TODOS");
   };
-
 
   // FUNCIÓN: Cierre de Sesión Completo (Cerrar sesión y purgar estados de memoria)
   const handleLogout = () => {
@@ -353,10 +376,8 @@ function App() {
     // - bg-gradient-to-br: Crea un fondo degradado moderno desde el tono gris slate-100 hacia el slate-200.
     // - antialiased: Suaviza las fuentes tipográficas para mejorar la legibilidad en pantallas móviles o monitores de alta densidad.
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col items-center justify-center p-4 antialiased">
-
       {/* Tarjeta central con ancho máximo controlado (max-w-md: ideal para verse como App Móvil) */}
       <div className="w-full max-w-md">
-
         {/* ENCABEZADO DE LA APLICACIÓN */}
         <header className="text-center mb-8">
           {/* Título principal con tipografía extra negrita. 'animate-bounce' hace saltar el emoji de ubicación */}
@@ -368,15 +389,12 @@ function App() {
             Solución: Docker + Django + React
           </p>
         </header>
-
         {/* EVALUACIÓN LÓGICA (Operador Ternario): ¿El usuario ya inició sesión? */}
         {isLoggedIn ? (
-
           /* ====================================================================
-             MÓDULO A: INTERFAZ DE USUARIO LOGUEADO
+            MÓDULO A: INTERFAZ DE USUARIO LOGUEADO
              ==================================================================== */
           <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
-
             {/* Barra superior de estado y desconexión */}
             <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-5">
               {/* Badge visual verde que indica conexión activa */}
@@ -395,7 +413,7 @@ function App() {
             {/* CONDICIONAL CORTO CIRCUITO (&&): Si el usuario es administrador, renderiza el selector de pestañas */}
             {isAdmin && (
               <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
-                {/* Pestaña Vista Empleado: Se activa (clase 'text-blue-600 shadow-md') si 'vistaAdmin' es false */}
+                {/* Pestaña Vista Empleado: Se activa si 'vistaAdmin' es false */}
                 <button
                   className={`flex-1 text-center py-2 text-sm font-bold rounded-lg transition-all ${!vistaAdmin ? "bg-white text-blue-600 shadow-md" : "text-slate-600 hover:text-slate-900"}`}
                   onClick={() => setVistaAdmin(false)}
@@ -414,73 +432,93 @@ function App() {
 
             {/* EVALUACIÓN DE VISTA ACTIVA: ¿Estamos en el rol común o en el de reportes? */}
             {!vistaAdmin ? (
-
               /* ----------------------------------------------------------------
-                 MODO EMPLEADO (MARCAJE DE ASISTENCIA)
+                MODO EMPLEADO (MARCAJE DE ASISTENCIA)
                  ---------------------------------------------------------------- */
               <div className="space-y-4">
-                {/* Botón principal para activar el GPS del dispositivo */}
-                {/* - disabled: Se bloquea automáticamente si está buscando satélites o guardando una checada */}
+                {/* NUEVO COMPONENTE: Selector de Sucursal Autorizada */}
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-left">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                    Punto de Trabajo Destino:
+                  </label>
+                  <select
+                    className="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs font-semibold text-slate-700 focus:outline-none focus:border-blue-400"
+                    value={sucursalSeleccionadaEmpleado?.id || ""}
+                    onChange={(e) => {
+                      // Busca el objeto completo de la sucursal basado en el ID seleccionado en el HTML
+                      const elegida = sucursales.find(
+                        (s) => s.id === parseInt(e.target.value),
+                      );
+                      setSucursalSeleccionadaEmpleado(elegida);
+                    }}
+                  >
+                    {sucursales.map((suc) => (
+                      <option key={suc.id} value={suc.id}>
+                        🏢 {suc.nombre} ({parseInt(suc.radio_maximo_metros)}m
+                        autorizados)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Botón para activar el hardware GPS de localización */}
                 <button
                   onClick={obtenerUbicacion}
-                  disabled={cargandoGps || enviandoRegistro}
+                  disabled={
+                    cargandoGps ||
+                    enviandoRegistro ||
+                    !sucursalSeleccionadaEmpleado
+                  }
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md active:scale-95 transition-all disabled:opacity-50"
                 >
-                  {/* Cambia dinámicamente el texto para avisar al usuario qué proceso se está ejecutando */}
                   {cargandoGps
                     ? "🛰️ Buscando satélites..."
                     : "🎯 Capturar Ubicación Actual"}
                 </button>
 
-                {/* BLOQUE DE ALERTA: Si la geocerca de Django denegó el acceso, pinta el recuadro de error rojo */}
                 {errorGps && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm font-medium text-red-700 text-center">
                     {errorGps}
                   </div>
                 )}
-
-                {/* BLOQUE DE ÉXITO: Si Django aceptó la checada, despliega el recuadro verde con confeti visual */}
                 {mensajeExito && (
                   <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm font-semibold text-emerald-800 text-center">
                     {mensajeExito}
                   </div>
                 )}
 
-                {/* CONDICIONAL: El mapa y los botones de Entrada/Salida solo nacerán si el GPS ya capturó coordenadas válidas */}
-                {latitud && longitud && (
+                {latitud && longitud && sucursalSeleccionadaEmpleado && (
                   <div className="space-y-4 border border-slate-100 rounded-xl p-3 bg-slate-50">
-
-                    {/* Lienzo del Mapa Interactivo (relative z-0 evita que se superponga sobre menús desplegables) */}
                     <div className="h-56 w-full rounded-lg overflow-hidden border border-slate-200 relative z-0">
                       <MapContainer
-                        center={[latitud, longitud]} // Centra la cámara del mapa en la posición del empleado.
-                        zoom={16}                    // Nivel de acercamiento óptimo para ver calles de la manzana.
+                        center={[latitud, longitud]}
+                        zoom={16}
                         style={{ height: "100%", width: "100%" }}
                       >
-                        {/* Descarga los mapas visuales gratuitos e ilimitados de OpenStreetMap */}
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-                        {/* Coloca el PIN azul exactamente donde se encuentra parado el empleado */}
                         <Marker position={[latitud, longitud]}>
                           <Popup>Tú estás aquí</Popup>
                         </Marker>
 
-                        {/* Dibuja en vivo la Geocerca circular de 50 metros alrededor de tu oficina */}
+                        {/* DINÁMICO: Cambia su centro y tamaño según la oficina que el usuario elija arriba */}
                         <Circle
-                          center={[19.7028, -101.1177]} // Coordenadas fijas de la sucursal.
-                          radius={50}                   // Radio exacto de tolerancia matemática.
+                          center={[
+                            parseFloat(sucursalSeleccionadaEmpleado.latitud),
+                            parseFloat(sucursalSeleccionadaEmpleado.longitud),
+                          ]}
+                          radius={parseFloat(
+                            sucursalSeleccionadaEmpleado.radio_maximo_metros,
+                          )}
                           pathOptions={{
-                            color: "#10b981",           // Borde verde esmeralda.
-                            fillColor: "#10b981",       // Relleno translúcido verde.
-                            fillOpacity: 0.15,          // Opacidad suave para no tapar las calles del mapa.
+                            color: "#10b981",
+                            fillColor: "#10b981",
+                            fillOpacity: 0.15,
                           }}
                         />
                       </MapContainer>
                     </div>
 
-                    {/* BOTONES DE DISPARO DE ASISTENCIA */}
                     <div className="grid grid-cols-2 gap-2">
-                      {/* Botón Verde: Envía el texto 'ENTRADA' a la lógica asíncrona */}
                       <button
                         onClick={() => registrarAsistencia("ENTRADA")}
                         disabled={enviandoRegistro}
@@ -488,7 +526,6 @@ function App() {
                       >
                         ⬇️ Entrada
                       </button>
-                      {/* Botón Naranja: Envía el texto 'SALIDA' a la lógica asíncrona */}
                       <button
                         onClick={() => registrarAsistencia("SALIDA")}
                         disabled={enviandoRegistro}
@@ -497,7 +534,6 @@ function App() {
                         ⬆️ Salida
                       </button>
                     </div>
-
                   </div>
                 )}
               </div>
@@ -506,7 +542,6 @@ function App() {
                 MODO ADMINISTRADOR (MONITORIZACIÓN Y AUDITORÍA GENERAL)
                 ---------------------------------------------------------------- */
               <div className="space-y-4">
-
                 {/* BARRA DE TÍTULO DE LA AUDITORÍA */}
                 <div className="flex justify-between items-center">
                   <div>
@@ -529,10 +564,9 @@ function App() {
                 </div>
 
                 {/* ==============================================================
-                   PANEL DE FILTROS INTERACTIVOS
+                  PANEL DE FILTROS INTERACTIVOS
                    ============================================================== */}
                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 space-y-3 text-left">
-
                   {/* BLOQUE A: RANGOS DE FECHA (CALENDARIOS) */}
                   <div className="grid grid-cols-2 gap-2">
                     {/* Input de Fecha de Inicio */}
@@ -609,50 +643,52 @@ function App() {
                 </div>
 
                 {/* ==============================================================
-                   MAPA DE MONITOREO GLOBAL (AUDITORÍA)
+                  MAPA DE MONITOREO GLOBAL (AUDITORÍA)
                    ============================================================== */}
                 <div className="h-72 w-full rounded-xl overflow-hidden border border-slate-200 relative z-0">
                   <MapContainer
-                    center={[19.7028, -101.1177]} // El mapa del administrador inicia centrado fijamente en la oficina.
-                    zoom={14}                     // Un zoom un poco más lejano (14) para alcanzar a ver pines que quedaron fuera del rango.
+                    center={[19.764375, -101.155017]} // Punto de inicio central por defecto
+                    zoom={14}
                     style={{ height: "100%", width: "100%" }}
                   >
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-                    {/* Dibuja la geocerca permitida (círculo verde translúcido) */}
-                    <Circle
-                      center={[19.7028, -101.1177]}
-                      radius={50}
-                      pathOptions={{
-                        color: "#10b981",
-                        fillColor: "#10b981",
-                        fillOpacity: 0.08, // Opacidad ultra baja para que no estorbe al haber múltiples marcadores encima.
-                      }}
-                    />
+                    {/* BUCLE 1 (NUEVO): Dibuja de forma dinámica la geocerca de CADA sucursal */}
+                    {sucursales.map((suc) => (
+                      <Circle
+                        key={`suc-circle-${suc.id}`} // Llave única combinada para el DOM de React
+                        center={[
+                          parseFloat(suc.latitud),
+                          parseFloat(suc.longitud),
+                        ]}
+                        radius={parseFloat(suc.radio_maximo_metros)}
+                        pathOptions={{
+                          color: "#10b981", // Borde verde esmeralda
+                          fillColor: "#10b981", // Relleno verde translúcido
+                          fillOpacity: 0.05, // Opacidad muy ligera para evitar superposiciones opacas
+                        }}
+                      />
+                    ))}
 
-                    {/* BUCLE ITERADOR (MAP): Dibuja un PIN en el mapa por cada registro de asistencia que pase los filtros */}
+                    {/* BUCLE 2 (EXISTENTE): Continúa dibujando los marcadores de las checadas de los empleados */}
                     {historialAsistencias.map((registro) => (
                       <Marker
-                        key={registro.id} // Identificador único obligatorio para que React optimice el renderizado.
+                        key={registro.id}
                         position={[
-                          parseFloat(registro.latitud), // Convierte el texto decimal de Django a número flotante.
-                          parseFloat(registro.longitud), // Convierte el texto decimal de Django a número flotante.
+                          parseFloat(registro.latitud),
+                          parseFloat(registro.longitud),
                         ]}
                       >
-                        {/* Ventana de información flotante que se despliega al presionar el pin */}
                         <Popup>
                           <div className="text-sm font-sans">
-                            {/* Muestra el nombre del empleado que checó */}
                             <p className="font-bold text-slate-800">
                               👤 {registro.usuario_nombre}
                             </p>
-                            {/* Badge textual que indica dinámicamente si fue una Entrada o una Salida */}
                             <p className="text-xs font-semibold mt-0.5 text-blue-600">
                               {registro.tipo === "ENTRADA"
                                 ? "⬇️ Entrada"
                                 : "⬆️ Salida"}
                             </p>
-                            {/* Fecha y hora formateada automáticamente según el idioma de la computadora del supervisor */}
                             <p className="text-[10px] text-slate-400 mt-1">
                               📅{" "}
                               {new Date(registro.fecha_hora).toLocaleString()}
@@ -667,7 +703,6 @@ function App() {
             )}
           </div>
         ) : (
-
           /* ====================================================================
               MÓDULO B: INTERFAZ DE USUARIO NO AUTENTICADO (PANTALLA DE LOGIN)
               ==================================================================== */
@@ -690,7 +725,6 @@ function App() {
 
             {/* FORMULARIO DE LOGUEO: 'onSubmit' intercepta el botón de envío y ejecuta la función asíncrona 'handleLogin' */}
             <form onSubmit={handleLogin} className="space-y-4">
-
               {/* BLOQUE: CAMPO DE TEXTO (USUARIO) */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
@@ -733,9 +767,15 @@ function App() {
               </button>
             </form>
           </div>
-        )} {/* Cierre del operador ternario principal que evalúa '{isLoggedIn ? ... : ...}' */}
-      </div> {/* Cierre del div contenedor de ancho máximo (w-full max-w-md) */}
-    </div>); {/* Cierre del div del fondo con gradiente (min-h-screen) */ }
+        )}{" "}
+        {/* Cierre del operador ternario principal que evalúa '{isLoggedIn ? ... : ...}' */}
+      </div>{" "}
+      {/* Cierre del div contenedor de ancho máximo (w-full max-w-md) */}
+    </div>
+  );
+  {
+    /* Cierre del div del fondo con gradiente (min-h-screen) */
+  }
 }
 
 // Exportación por defecto para que este componente pueda ser importado y renderizado desde el archivo central 'main.jsx' o 'index.js'.

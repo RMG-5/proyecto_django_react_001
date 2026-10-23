@@ -13,11 +13,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 # Modelos, Serializadores y utilidades de Django para HTTP y Fechas.
-from .models import RegistroAsistencia
-from .serializers import RegistroAsistenciaSerializer
+from .models import Sucursal, RegistroAsistencia
+from .serializers import SucursalSerializer, RegistroAsistenciaSerializer
 from django.http import HttpResponse
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Librería para generar archivos de Excel.
 from openpyxl import Workbook
@@ -60,6 +60,14 @@ def calcular_distancia_metros(lat1, lon1, lat2, lon2):
     # Retorna el resultado final de la distancia medida en metros.
     return c * radio_tierra_metros
 
+class SucursalViewSet(viewsets.ModelViewSet):
+    """
+    Controlador automático para que React pueda leer el catálogo de sucursales.
+    """
+    queryset = Sucursal.objects.all()
+    serializer_class = SucursalSerializer
+    permission_classes = [IsAuthenticated]
+
 # ==============================================================================
 # 4. CONTROLADOR PRINCIPAL (VIEWSET)
 # ==============================================================================
@@ -76,22 +84,38 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
         Filtra y restringe los registros de asistencia que se muestran en la API.
         """
         user = self.request.user
-        
+
         # Filtro por Rol: Staff ve todo, usuario común solo ve lo propio.
         if user.is_staff:
             queryset = RegistroAsistencia.objects.all()
         else:
             queryset = RegistroAsistencia.objects.filter(usuario=user)
 
-        # Captura los parámetros de filtro pasados por la URL (?fecha_inicio=&fecha_fin=).
+        # 1. Captura los parámetros de filtro pasados por la URL (?fecha_inicio=&fecha_fin=).
         fecha_inicio_param = self.request.query_params.get('fecha_inicio')
         fecha_fin_param = self.request.query_params.get('fecha_fin')
 
+        # Obtén la zona horaria activa del proyecto
+        tz = timezone.get_current_timezone()
+
         # Si se envían fechas, filtra por ese rango. Si no, usa los últimos 7 días.
         if fecha_inicio_param and fecha_fin_param:
-            fecha_fin_completa = f"{fecha_fin_param}T23:59:59.999999"
-            queryset = queryset.filter(fecha_hora__range=[fecha_inicio_param, fecha_fin_completa])
+            # Convertimos los textos de la URL 'YYYY-MM-DD' a objetos datetime nativos
+            inicio_naive = datetime.strptime(fecha_inicio_param, "%Y-%m-%d")
+            fin_naive = datetime.strptime(fecha_fin_param, "%Y-%m-%d")
+            
+            # Combinamos con las horas límites (00:00:00 y 23:59:59.999999)
+            inicio_con_hora = datetime.combine(inicio_naive.date(), datetime.min.time())
+            fin_con_hora = datetime.combine(fin_naive.date(), datetime.max.time())
+            
+            # Les asignamos la zona horaria correcta para cumplir con Django
+            fecha_inicio = timezone.make_aware(inicio_con_hora, tz)
+            fecha_fin = timezone.make_aware(fin_con_hora, tz)
+            
+            queryset = queryset.filter(fecha_hora__range=[fecha_inicio, fecha_fin])
+
         else:
+            # Esta parte queda limpia y segura usando el tiempo actual con zona horaria
             fecha_hoy = timezone.now()
             hace_una_semana = fecha_hoy - timedelta(days=7)
             queryset = queryset.filter(fecha_hora__range=[hace_una_semana, fecha_hoy])
@@ -141,22 +165,36 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """
-        Intercepta la creación (POST) para validar si está dentro del rango GPS.
+        Valida dinámicamente si el empleado se encuentra dentro de la geocerca
+        específica de la sucursal seleccionada.
         """
-        # Extrae la ubicación actual que envía el dispositivo del empleado.
+        # 1. Extraemos los parámetros enviados por el Frontend de React
+        sucursal_id = self.request.data.get('sucursal')
         empleado_lat = float(self.request.data.get('latitud'))
         empleado_lon = float(self.request.data.get('longitud'))
 
-        # Calcula la distancia real en metros usando la función de Haversine.
-        distancia_a_oficina = calcular_distancia_metros(OFICINA_LAT, OFICINA_LON, empleado_lat, empleado_lon)
+        if not sucursal_id:
+            raise ValidationError({"error_geocerca": "Es obligatorio seleccionar una sucursal para checar."})
 
-        print(f"--- DETECCIÓN DE GEOCERCA: El empleado está a {distancia_a_oficina:.2f} metros de la oficina. ---")
+        # 2. Buscamos en la base de datos la sucursal elegida para extraer sus coordenadas y rango tolerado
+        try:
+            sucursal_activa = Sucursal.objects.get(id=sucursal_id)
+        except Sucursal.DoesNotExist:
+            raise ValidationError({"error_geocerca": "La sucursal seleccionada no es válida o fue dada de baja."})
 
-        # Si el empleado está a más de 50 metros, se bloquea la checada de inmediato.
-        if distancia_a_oficina > RADIO_MAXIMO_METROS:
+        # 3. Calculamos la distancia usando la fórmula de Haversine contra los datos dinámicos del registro de la Sucursal
+        distancia_a_sucursal = calcular_distancia_metros(
+            float(sucursal_activa.latitud), float(sucursal_activa.longitud),
+            empleado_lat, empleado_lon
+        )
+
+        print(f"--- GEOCERCA DINÁMICA: El empleado intenta checar en '{sucursal_activa.nombre}'. Distancia calculada: {distancia_a_sucursal:.2f} metros. ---")
+
+        # 4. Validación de Seguridad Física Dinámica
+        if distancia_a_sucursal > float(sucursal_activa.radio_maximo_metros):
             raise ValidationError({
-                "error_geocerca": f"Checada denegada. Estás demasiado lejos del punto autorizado (Distancia: {distancia_a_oficina:.2f} metros). Máximo permitido: {RADIO_MAXIMO_METROS} metros."
+                "error_geocerca": f"Checada denegada en {sucursal_activa.nombre}. Estás demasiado lejos del punto autorizado (Distancia actual: {distancia_a_sucursal:.2f} metros). Límite permitido: {sucursal_activa.radio_maximo_metros} metros."
             })
 
-        # Si pasa la geocerca, se asocia el registro al usuario logueado y se guarda.
+        # 5. Si supera la geocerca, guarda la asistencia inyectando el usuario de la sesión
         serializer.save(usuario=self.request.user)
