@@ -21,7 +21,7 @@ class SucursalAdmin(admin.ModelAdmin):
     class Media:
         # 1. Cargamos los estilos CSS de Leaflet desde su CDN oficial
         css = {
-            'all': ('https://unpkg.com/leaflet/dist/leaflet.css',)
+            'all': ('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',)
         }
         # 2. Cargamos primero la librería Leaflet y luego tu script personalizado
         js = (

@@ -1,8 +1,8 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
-\restrict kzaBWFQwuHAwalE1oaSD09rCqWx9GEONCKKjTwNRsdvmyM6vdKTA8UlrdnPpYJe
+\restrict RmS9dXvex3tu0hw3cRFTaFdi6IQs9le5TxFdwVcbCDrSU9MUvXhL6H8VevXMvO5
 
 -- Dumped from database version 18.6 (Debian 18.6-1.pgdg13+2)
 -- Dumped by pg_dump version 18.6 (Debian 18.6-1.pgdg13+2)
@@ -379,6 +379,38 @@ COPY public.asistencias_registroasistencia (id, fecha_hora, tipo, latitud, longi
 4	2026-10-23 17:12:03.901753+00	SALIDA	19.702920	-101.117853	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	2
 5	2026-10-23 17:32:38.861503+00	ENTRADA	19.702200	-101.123600	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	3
 6	2026-10-23 17:57:47.121255+00	SALIDA	19.702200	-101.123600	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	3
+7	2026-10-23 21:25:09.959335+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+8	2026-10-23 21:25:55.120771+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+9	2026-10-23 21:25:57.681751+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+10	2026-10-23 21:27:09.344873+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+11	2026-10-23 21:27:53.755999+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+12	2026-10-23 21:32:10.032442+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+13	2026-10-23 21:38:31.008458+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+14	2026-10-23 21:38:51.494542+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+15	2026-10-23 21:43:31.57824+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+16	2026-10-23 21:45:51.501716+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+17	2026-10-23 21:46:28.150559+00	ENTRADA	19.700600	-101.185600	Desconocido	3	2
+32	2026-10-24 01:06:53.846013+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	2	4
+33	2026-10-24 01:07:22.350215+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	2	4
+34	2026-10-24 01:07:31.661064+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	2	4
+35	2026-10-24 01:10:12.831369+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	4	4
+36	2026-10-24 01:12:25.740953+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	3	4
+37	2026-10-24 01:13:01.21863+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	2	4
+38	2026-10-24 01:13:25.186536+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+39	2026-10-24 01:14:07.242691+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+40	2026-10-24 01:14:22.545749+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	2	4
+41	2026-10-24 01:14:33.819345+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	3	4
+42	2026-10-24 01:18:03.876503+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	4	4
+43	2026-10-24 01:20:24.832717+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+44	2026-10-24 01:27:39.503719+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	2	4
+45	2026-10-24 01:27:50.474605+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+46	2026-10-24 01:34:19.322657+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+47	2026-10-24 01:34:28.706123+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	3	4
+48	2026-10-24 01:45:27.397905+00	ENTRADA	19.764889	-101.154902	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	2	1
+49	2026-10-24 01:45:50.301459+00	SALIDA	19.764888	-101.154900	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	1
+50	2026-10-24 02:09:07.872074+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+51	2026-10-24 02:27:33.058742+00	ENTRADA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
+52	2026-10-24 02:27:36.104926+00	SALIDA	19.701400	-101.192200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Sa	1	4
 \.
 
 
@@ -387,9 +419,11 @@ COPY public.asistencias_registroasistencia (id, fecha_hora, tipo, latitud, longi
 --
 
 COPY public.asistencias_sucursal (id, nombre, latitud, longitud, radio_maximo_metros) FROM stdin;
-1	Obra-01	19.764175	-101.155084	100.0
 2	Obra-02	19.702940	-101.117681	200.0
 3	Obra-03	19.702466	-101.123314	50.0
+4	Obra-04	19.701466	-101.192236	50.0
+5	obra-05	19.761857	-101.142883	20.0
+1	Obra-01	19.764492	-101.154996	100.0
 \.
 
 
@@ -465,7 +499,7 @@ COPY public.auth_user (id, password, last_login, is_superuser, username, first_n
 2	pbkdf2_sha256$1500000$q37GdACuFX9zkgj1PSvOwR$NLaiiBBIQL6DVPg4Q394sqefUhLa2oFG2AdpaCK4EhQ=	\N	f	Juan_Perez_001	Juan	Perez	juan.perez.001@checador.mx	f	t	2026-10-23 15:20:09+00
 3	pbkdf2_sha256$1500000$nDKBou4yMvlJZj4tlEAO4F$x5+oAnZIce4++1UJpcHNDQq9vWWe5vMgK2nYDu4i8DY=	\N	f	Luis_Lopez_003	Luis	Lopez	luis.lopez.003@checagor.mx	f	t	2026-10-23 15:20:48+00
 4	pbkdf2_sha256$1500000$30v5B88Goqfh0i2vznQZOO$7JtB+3aAjfymSvtztlVyUTI8it70cPgCFZAIajT5WC8=	\N	f	Pedro_Chavez_002	Pedro	Chavez	pedro.chavez.002@checador.mx	f	t	2026-10-23 15:21:29+00
-1	pbkdf2_sha256$1500000$dIV5sN3ldrvNlu8KMdCJnq$S3aWanwSUFJ72vC+/gmm0GIY2UiOlaN80oVvrKK6k7M=	2026-10-23 16:35:58.999854+00	t	rmg5	Ricardo	Garcia	ricardo.garcia@checador.mx	t	t	2026-10-23 15:08:05+00
+1	pbkdf2_sha256$1500000$dIV5sN3ldrvNlu8KMdCJnq$S3aWanwSUFJ72vC+/gmm0GIY2UiOlaN80oVvrKK6k7M=	2026-10-24 01:59:30.437302+00	t	rmg5	Ricardo	Garcia	ricardo.garcia@checador.mx	t	t	2026-10-23 15:08:05+00
 \.
 
 
@@ -490,10 +524,10 @@ COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
 --
 
 COPY public.authtoken_token (key, created, user_id) FROM stdin;
-ebe54e6e8775ffa6d7765f0afb5d5263eb6c8f5e	2026-10-23 15:08:44.051194+00	1
 540ba76662e0d72165adc7cd28a6345203cf6423	2026-10-23 15:22:19.202354+00	2
 1f81dec830b55834499e197117d3a8ae99657251	2026-10-23 15:22:23.852306+00	3
 6b53d4459cb59c820367095b696abc53f750ed8a	2026-10-23 15:22:28.899456+00	4
+c5fed123666d659e2240fe9ef3d076c91d20c58e	2026-10-24 01:12:37.164111+00	1
 \.
 
 
@@ -536,6 +570,26 @@ COPY public.django_admin_log (id, action_time, object_id, object_repr, action_fl
 32	2026-10-23 17:31:44.143946+00	3	Obra-03 (Radio: 50.0m)	2	[{"changed": {"fields": ["Latitud", "Longitud"]}}]	10	1
 33	2026-10-23 17:32:04.326854+00	3	Obra-03 (Radio: 50.0m)	2	[{"changed": {"fields": ["Latitud", "Longitud"]}}]	10	1
 34	2026-10-23 17:32:29.924037+00	3	Obra-03 (Radio: 50.0m)	2	[{"changed": {"fields": ["Latitud", "Longitud"]}}]	10	1
+35	2026-10-23 21:24:58.733015+00	4	Obra-04 (Radio: 50.0m)	1	[{"added": {}}]	10	1
+36	2026-10-23 21:46:28.151168+00	17	Luis_Lopez_003 - ENTRADA - Obra-02	1	[{"added": {}}]	9	1
+37	2026-10-23 22:23:10.791811+00	21	rmg5 - SALIDA - Obra-04	3		9	1
+38	2026-10-23 22:23:10.791845+00	20	rmg5 - SALIDA - Obra-04	3		9	1
+39	2026-10-23 22:23:10.791857+00	19	rmg5 - ENTRADA - Obra-04	3		9	1
+40	2026-10-23 22:23:10.791866+00	18	rmg5 - ENTRADA - Obra-04	3		9	1
+41	2026-10-23 22:26:38.681399+00	26	rmg5 - ENTRADA - Obra-04	3		9	1
+42	2026-10-23 22:26:38.681441+00	25	rmg5 - ENTRADA - Obra-04	3		9	1
+43	2026-10-23 22:26:38.681455+00	24	rmg5 - ENTRADA - Obra-04	3		9	1
+44	2026-10-23 22:26:38.681466+00	23	rmg5 - ENTRADA - Obra-04	3		9	1
+45	2026-10-23 22:26:38.681475+00	22	rmg5 - SALIDA - Obra-04	3		9	1
+46	2026-10-24 01:05:41.799568+00	1	ebe54e6e8775ffa6d7765f0afb5d5263eb6c8f5e	3		8	1
+47	2026-10-24 01:13:55.750531+00	31	rmg5 - ENTRADA - Obra-04	3		9	1
+48	2026-10-24 01:13:55.750562+00	30	rmg5 - SALIDA - Obra-04	3		9	1
+49	2026-10-24 01:13:55.750572+00	29	rmg5 - SALIDA - Obra-04	3		9	1
+50	2026-10-24 01:13:55.75058+00	28	rmg5 - ENTRADA - Obra-04	3		9	1
+51	2026-10-24 01:13:55.750588+00	27	rmg5 - ENTRADA - Obra-04	3		9	1
+52	2026-10-24 01:48:31.642244+00	5	obra-05 (Radio: 20m)	1	[{"added": {}}]	10	1
+53	2026-10-24 01:59:21.242878+00	1	Obra-01 (Radio: 100.0m)	2	[{"changed": {"fields": ["Latitud", "Longitud"]}}]	10	1
+54	2026-10-24 02:00:52.315392+00	1	Obra-01 (Radio: 100.0m)	2	[{"changed": {"fields": ["Latitud", "Longitud"]}}]	10	1
 \.
 
 
@@ -597,6 +651,8 @@ COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
 5lz1pgbyywcqev3pszzbs0muo846iy46	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xKGsi:7f8PjQIQuykr41ZRGo264Nfx-Fb0AIKU1c74HuvpI1Q	2026-11-06 15:08:32.775178+00
 3n7eo3twlbmad6mhq32fvv0v1csu2iao	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xKI9o:KbOptmq4uzk__KBOat8e9yWL6wUfeOg1QkjbGNZLsaI	2026-11-06 16:30:16.086609+00
 em9cgjvisjzx3g3egi9km8fch69czbfv	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xKIFL:NzFJ6YTRnctwrnGdoUiUI3MdrzZTyYH6t_sxLPAH-_E	2026-11-06 16:35:59.002585+00
+2zftj65nv166eabog8u8usptgv2adczd	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xKMin:0o_BmD69yYGpWw5ScrIx1k75kICCdWod99uFn4-yghA	2026-11-06 21:22:41.907278+00
+r2pvnhw32nq0j6406v3plrdi6wrbaxen	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xKR2g:yhUc6Bsi4rGdCHFrOXCwGD3hw8ogD3nPNaJb-_aDpa4	2026-11-07 01:59:30.439353+00
 \.
 
 
@@ -604,14 +660,14 @@ em9cgjvisjzx3g3egi9km8fch69czbfv	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIq
 -- Name: asistencias_registroasistencia_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 6, true);
+SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 52, true);
 
 
 --
 -- Name: asistencias_sucursal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.asistencias_sucursal_id_seq', 3, true);
+SELECT pg_catalog.setval('public.asistencias_sucursal_id_seq', 5, true);
 
 
 --
@@ -660,7 +716,7 @@ SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.django_admin_log_id_seq', 34, true);
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 54, true);
 
 
 --
@@ -1072,5 +1128,5 @@ ALTER TABLE ONLY public.django_admin_log
 -- PostgreSQL database dump complete
 --
 
-\unrestrict kzaBWFQwuHAwalE1oaSD09rCqWx9GEONCKKjTwNRsdvmyM6vdKTA8UlrdnPpYJe
+\unrestrict RmS9dXvex3tu0hw3cRFTaFdi6IQs9le5TxFdwVcbCDrSU9MUvXhL6H8VevXMvO5
 

@@ -249,7 +249,7 @@ function App() {
 
     try {
       // Envía la petición POST con los datos que nuestro backend y serializador esperan recibir.
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_API_URL}/api/asistencias/`,
         {
           tipo: tipoEvento,

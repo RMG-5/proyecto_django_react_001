@@ -8,7 +8,9 @@ import math
 # Clases de Django REST Framework (DRF) para la API y manejo de errores/permisos.
 from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated 
+from rest_framework.permissions import IsAuthenticated, IsAdminUser 
+from rest_framework.authentication import TokenAuthentication
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -21,6 +23,8 @@ from datetime import timedelta, datetime
 
 # Librería para generar archivos de Excel.
 from openpyxl import Workbook
+
+
 
 
 # ==============================================================================
@@ -64,9 +68,22 @@ class SucursalViewSet(viewsets.ModelViewSet):
     """
     Controlador automático para que React pueda leer el catálogo de sucursales.
     """
-    queryset = Sucursal.objects.all()
     serializer_class = SucursalSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        """
+        Asigna permisos dinámicos: 
+        Cualquier empleado logueado puede VER (GET) las sucursales.
+        Solo el Staff/Administrador puede CREAR, EDITAR o BORRAR.
+        """
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+    
+    queryset = Sucursal.objects.all()
+
+    
 
 # ==============================================================================
 # 4. CONTROLADOR PRINCIPAL (VIEWSET)
@@ -78,6 +95,7 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
     """
     serializer_class = RegistroAsistenciaSerializer
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def get_queryset(self):
         """
@@ -168,6 +186,7 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
         Valida dinámicamente si el empleado se encuentra dentro de la geocerca
         específica de la sucursal seleccionada.
         """
+        sucursal_id = self.request.data.get('sucursal')
         # 1. Extraemos los parámetros enviados por el Frontend de React
         sucursal_id = self.request.data.get('sucursal')
         empleado_lat = float(self.request.data.get('latitud'))
