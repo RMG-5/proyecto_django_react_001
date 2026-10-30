@@ -1,0 +1,13 @@
+Django==6.1.0
+
+django-cors-headers==4.4.0
+
+djangorestframework==3.18.0
+
+django-environ==0.14.0
+
+psycopg[c]==3.2.4
+
+openpyxl==3.1.5
+
+djangorestframework-simplejwt==5.4.0

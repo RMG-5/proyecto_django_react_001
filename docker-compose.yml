@@ -1,0 +1,65 @@
+services:
+
+  db:
+    image: postgres:18.6
+    container_name: checador_db
+    restart: always    
+    environment:
+      POSTGRES_DB: checador_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpass123      
+    ports:
+      - "5433:5432"      
+    volumes:
+      - postgres_data:/var/lib/postgresql/18/docker
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d checador_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  backend:
+    build: ./backend
+    container_name: checador_backend
+    command: python manage.py runserver 0.0.0.0:8000               
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app      
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: checador_frontend
+    command: npm run dev -- --host
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "5173:5173"    
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules         
+    depends_on:
+      backend:
+        condition: service_started
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_django
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PYTHONWARNINGS: "ignore"      
+    ports:
+      - "80:80"    
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

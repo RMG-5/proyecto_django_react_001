@@ -1,0 +1,12 @@
+# Crucial: No copiar las librerías locales instaladas en tu sistema operativo
+node_modules/
+dist/
+
+# Ignorar entornos locales para que Docker use los suyos
+.env
+.env.development
+.env.production
+
+# Control de versiones local
+.git
+.gitignore
