@@ -336,7 +336,7 @@ function App() {
           {
             username: nuevoUser,
             password: nuevoPass,
-            is_staff: nuevoIsAdmin,
+            is_admin: nuevoIsAdmin,
           },
           { headers: { Authorization: `Token ${token}` } },
         );
@@ -1152,7 +1152,6 @@ function App() {
                   </div>
                 )}
 
-                {}
                 {subVistaAdmin === "nuevo_empleado" && (
                   <div>
                     <form
@@ -1211,7 +1210,7 @@ function App() {
                                 username: null,
                               });
                           }}
-                          placeholder="Ej. juan.perez"
+                          placeholder="Ej. david.perez"
                         />
                         {erroresCampos.username && (
                           <p className="text-rose-600 text-[11px] font-medium mt-1 pl-1">
