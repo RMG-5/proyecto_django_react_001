@@ -1,0 +1,14 @@
+# Evita pasar el entorno virtual local de Windows al contenedor de Linux
+.venv/
+__pycache__/
+*.pyc
+
+# Evita que el .env local interfiera con las variables del contenedor
+.env
+
+# Archivos de base de datos local (Postgres se maneja aparte)
+db.sqlite3
+
+# Control de versiones local
+.git
+.gitignore
