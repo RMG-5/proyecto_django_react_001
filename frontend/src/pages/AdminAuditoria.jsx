@@ -13,6 +13,13 @@ export default function AdminAuditoria({ sucursales, mostrarToast }) {
   const [sucursalSeleccionadaFiltro, setSucursalSeleccionadaFiltro] =
     useState("TODAS");
 
+  useEffect(() => {
+    api
+      .get("/usuarios/")
+      .then((res) => setUsuariosFiltro(res.data))
+      .catch(() => {});
+  }, []);
+
   // Efecto para cargar el historial de asistencias según los filtros seleccionados
   useEffect(() => {
     const params = {};
@@ -31,12 +38,13 @@ export default function AdminAuditoria({ sucursales, mostrarToast }) {
       .get("/asistencias/", { params })
       .then((response) => {
         setHistorialAsistencias(response.data);
-        if (usuariosFiltro.length === 0) {
-          setUsuariosFiltro(response.data);
-        }
       })
-      .catch(() => {
-        mostrarToast("error", "Error al cargar el historial de asistencias.");
+      .catch((err) => {
+        const msgError =
+          err.response?.data?.error ||
+          err.response?.data?.detail ||
+          "Error al cargar el historial de asistencias.";
+        mostrarToast("error", msgError);
       });
   }, [fechaInicio, fechaFin, usuarioSeleccionado, sucursalSeleccionadaFiltro]);
 
@@ -78,8 +86,17 @@ export default function AdminAuditoria({ sucursales, mostrarToast }) {
       link.click();
       link.parentNode.removeChild(link);
       mostrarToast("exito", "Reporte Excel descargado.");
-    } catch {
-      mostrarToast("error", "No se pudo generar el reporte Excel.");
+    } catch (err) {
+      let msgError = "No se pudo generar el reporte Excel.";
+      if (err.response?.data instanceof Blob) {
+        try {
+          const texto = await err.response.data.text();
+          const jsonError = JSON.parse(texto);
+          msgError = jsonError.error || jsonError.detail || msgError;
+        } catch {
+        }
+      }
+      mostrarToast("error", msgError);
     }
   };
 
@@ -184,13 +201,9 @@ export default function AdminAuditoria({ sucursales, mostrarToast }) {
             onChange={(e) => setUsuarioSeleccionado(e.target.value)}
           >
             <option value="TODOS">👥 Mostrar Todos los Empleados</option>
-            {Array.from(
-              new Map(
-                usuariosFiltro.map((item) => [item.usuario_nombre, item]),
-              ).values(),
-            ).map((asis) => (
-              <option key={asis.id} value={asis.usuario_nombre}>
-                👤 {asis.usuario_nombre.replace(/_/g, " ")}
+            {usuariosFiltro.map((u) => (
+              <option key={u.id} value={u.username}>
+                👤 {u.username.replace(/_/g, " ")}
               </option>
             ))}
           </select>

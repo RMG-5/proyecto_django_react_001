@@ -50,7 +50,7 @@ class RegistroAsistencia(models.Model):
         User, on_delete=models.CASCADE, related_name='asistencias')
 
     # - auto_now_add=True: Django asigna automáticamente la fecha y hora actual al momento de guardarse por primera vez.
-    fecha_hora = models.DateTimeField(auto_now_add=True)
+    fecha_hora = models.DateTimeField(auto_now_add=True, db_index=True)
 
     tipo = models.CharField(
         max_length=10, choices=TIPO_EVENTO, verbose_name="Tipo de Registro")

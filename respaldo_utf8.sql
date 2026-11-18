@@ -1,8 +1,8 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
-\restrict oaPcgGaQaHxva5D1GjrxsYJHh1f6E7iWwCENtusC7W9IDuZn2VaEBhRCagzvglD
+\restrict 3Va59tAzZTsDzQwXgEQk5Gbn1FFBH1yYqlA4V2M4GJLHZqY9T1fSLwuYfyWbiBB
 
 -- Dumped from database version 18.6 (Debian 18.6-1.pgdg13+2)
 -- Dumped by pg_dump version 18.6 (Debian 18.6-1.pgdg13+2)
@@ -379,30 +379,30 @@ ALTER TABLE public.django_session OWNER TO admin;
 
 COPY public.asistencias_registroasistencia (id, fecha_hora, tipo, latitud, longitud, dispositivo, usuario_id, sucursal_id, estatus) FROM stdin;
 32	2026-11-12 18:06:56.787106+00	SALIDA	19.702926	-101.117863	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	20	4	A_TIEMPO
-1	2026-10-13 15:07:47.379283+00	ENTRADA	19.764600	-101.155400	Desconocido	1	1	LIBRE
-4	2026-10-13 23:02:03.901753+00	SALIDA	19.765100	-101.155400	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	1	LIBRE
 18	2026-10-30 14:11:35.624483+00	ENTRADA	19.700300	-101.123600	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Sa	1	3	RETARDO
 21	2026-10-30 16:31:33.929516+00	SALIDA	19.700300	-101.123600	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Sa	1	3	A_TIEMPO
 28	2026-11-12 14:31:09.293206+00	ENTRADA	19.702923	-101.117862	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	4	A_TIEMPO
-30	2026-11-12 15:46:05.356229+00	SALIDA	19.702922	-101.117861	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	4	A_TIEMPO
 31	2026-11-12 18:04:11.227439+00	ENTRADA	19.702925	-101.117856	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	20	4	RETARDO
-33	2026-11-13 14:43:05.53649+00	ENTRADA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	1	3	RETARDO
 34	2026-11-13 14:46:31.058683+00	ENTRADA	19.702922	-101.117867	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	20	4	A_TIEMPO
 35	2026-11-13 14:48:08.941756+00	ENTRADA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	14	3	RETARDO
 36	2026-11-13 16:03:12.346933+00	SALIDA	19.702922	-101.117871	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	20	4	A_TIEMPO
-37	2026-11-13 18:28:53.770391+00	SALIDA	19.702922	-101.117868	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	4	A_TIEMPO
 39	2026-11-17 14:29:20.157155+00	ENTRADA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	14	3	RETARDO
 40	2026-11-17 14:29:32.042862+00	ENTRADA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	1	3	RETARDO
 41	2026-11-17 14:31:25.070048+00	ENTRADA	19.702920	-101.117873	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	20	4	A_TIEMPO
 44	2026-11-18 15:06:34.486684+00	ENTRADA	19.702928	-101.117855	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	20	4	A_TIEMPO
 46	2026-11-18 16:16:33.601196+00	SALIDA	19.702825	-101.117752	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	20	4	ANTICIPADA
 38	2026-11-13 23:42:40.832011+00	SALIDA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	14	3	A_TIEMPO
-45	2026-11-18 23:00:48.820448+00	SALIDA	19.701910	-101.192400	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	1	3	A_TIEMPO
-42	2026-11-18 14:00:16.038124+00	ENTRADA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	14	3	A_TIEMPO
-43	2026-11-18 14:00:26.359067+00	ENTRADA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	1	3	A_TIEMPO
-50	2026-11-18 18:12:53.321129+00	SALIDA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	14	3	ANTICIPADA
 51	2026-11-17 08:00:38.063623+00	ENTRADA	19.764175	-101.155084	\N	14	1	A_TIEMPO
 52	2026-11-17 17:00:38.063623+00	SALIDA	19.764175	-101.155084	\N	14	1	A_TIEMPO
+54	2026-11-18 20:10:03.094845+00	ENTRADA	19.713400	-101.225200	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	14	15	A_TIEMPO
+53	2026-11-18 20:09:46.211485+00	ENTRADA	19.713200	-101.225000	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	1	15	A_TIEMPO
+55	2026-11-18 21:14:58.30679+00	SALIDA	19.713300	-101.225100	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	14	15	ANTICIPADA
+56	2026-11-18 22:10:54.254867+00	SALIDA	19.713700	-101.225100	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	1	15	A_TIEMPO
+1	2026-09-13 15:07:47.379283+00	ENTRADA	19.764600	-101.155400	Desconocido	1	1	LIBRE
+4	2026-09-13 23:02:03.901753+00	SALIDA	19.765100	-101.155400	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	1	LIBRE
+33	2026-11-13 13:43:05.53649+00	ENTRADA	19.701800	-101.192300	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Sa	1	3	A_TIEMPO
+37	2026-11-13 20:28:53.770391+00	SALIDA	19.702922	-101.117868	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	4	A_TIEMPO
+30	2026-11-12 23:46:05.356229+00	SALIDA	19.702922	-101.117861	Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Mobile Sa	1	4	A_TIEMPO
 \.
 
 
@@ -412,8 +412,9 @@ COPY public.asistencias_registroasistencia (id, fecha_hora, tipo, latitud, longi
 
 COPY public.asistencias_sucursal (id, nombre, latitud, longitud, radio_maximo_metros, hora_entrada, hora_salida, tolerancia_minutos, activa) FROM stdin;
 3	Obra-03 Centro Morelia	19.701809	-101.192300	50.0	08:00:00	12:30:00	10	t
-4	Obra-02 Trabajo	19.702850	-101.117783	25.0	09:00:00	17:00:00	10	t
-1	Obra-01 Casa	19.764175	-101.155084	75.0	\N	\N	0	t
+1	Obra-01 Casa	19.764175	-101.155084	75.0	14:00:00	15:00:00	10	t
+15	Obra-04 Calle Octava	19.713289	-101.225136	75.0	14:00:00	16:00:00	10	t
+4	Obra-02 Trabajo	19.702850	-101.117783	25.0	08:00:00	17:00:00	10	t
 \.
 
 
@@ -489,8 +490,8 @@ COPY public.auth_user (id, password, last_login, is_superuser, username, first_n
 21	pbkdf2_sha256$1500000$TFbLgJ9Q0w4svStikqeQvV$5H9bpTV0q8Jr5d9sru5rnHKjpHYWD3FwtsefpxMa5zo=	\N	f	hector_leonardo_123				f	t	2026-11-09 14:35:21.528989+00
 24	pbkdf2_sha256$1500000$QjzQKaasyl4LgSZOZNtVqT$/ooudtbCI9EER0SlKZBwUibAMm8ou2Q8mn/N4vK5qDg=	\N	f	kevin_hiddeki_123				f	t	2026-11-10 16:34:16.135684+00
 14	pbkdf2_sha256$1500000$WBn7RR924VaUhi0NhHlxUF$HHFKEqQlFUb4d9wbohztsWG622h+dd9SQv8/v7kbKD4=	\N	f	brayan_omar_123				f	t	2026-10-30 18:23:58+00
-1	pbkdf2_sha256$1500000$dIV5sN3ldrvNlu8KMdCJnq$S3aWanwSUFJ72vC+/gmm0GIY2UiOlaN80oVvrKK6k7M=	2026-11-10 14:41:22.585729+00	t	rmg5	Ricardo	Garcia	ricardo.garcia@checador.mx	t	t	2026-10-23 15:08:05+00
 20	pbkdf2_sha256$1500000$iG6yhXmy3me8VxWtnN3sNA$gjSdf94vWndUZZdfgdv4HloMBKnw18S/xr4BYcoMQ98=	\N	f	nancy_chavez_123				t	t	2026-11-09 14:34:29.915519+00
+1	pbkdf2_sha256$1500000$dIV5sN3ldrvNlu8KMdCJnq$S3aWanwSUFJ72vC+/gmm0GIY2UiOlaN80oVvrKK6k7M=	2026-11-18 20:04:48.519121+00	t	rmg5	Ricardo	Garcia	ricardo.garcia@checador.mx	t	t	2026-10-23 15:08:05+00
 \.
 
 
@@ -618,6 +619,15 @@ COPY public.django_admin_log (id, action_time, object_id, object_repr, action_fl
 90	2026-11-18 18:05:47.936095+00	47	brayan_omar_123 || Obra-03 Centro Morelia || SALIDA -  ANTICIPADA	3		9	1
 91	2026-11-18 18:11:54.772513+00	48	brayan_omar_123 || Obra-03 Centro Morelia || SALIDA -  ANTICIPADA	3		9	1
 92	2026-11-18 18:12:42.189043+00	49	brayan_omar_123 || Obra-03 Centro Morelia || SALIDA -  ANTICIPADA	3		9	1
+93	2026-11-18 20:05:04.674242+00	45	rmg5 || Obra-03 Centro Morelia || SALIDA -  A_TIEMPO	3		9	1
+94	2026-11-18 20:05:04.674277+00	50	brayan_omar_123 || Obra-03 Centro Morelia || SALIDA -  ANTICIPADA	3		9	1
+95	2026-11-18 20:05:04.674289+00	43	rmg5 || Obra-03 Centro Morelia || ENTRADA -  A_TIEMPO	3		9	1
+96	2026-11-18 20:05:04.674299+00	42	brayan_omar_123 || Obra-03 Centro Morelia || ENTRADA -  A_TIEMPO	3		9	1
+97	2026-11-18 20:10:52.389663+00	54	brayan_omar_123 || Obra-04 Calle Octava || ENTRADA -  A_TIEMPO	2	[{"changed": {"fields": ["Latitud", "Longitud"]}}]	9	1
+98	2026-11-18 20:11:02.581739+00	53	rmg5 || Obra-04 Calle Octava || ENTRADA -  A_TIEMPO	2	[{"changed": {"fields": ["Latitud", "Longitud"]}}]	9	1
+99	2026-11-18 22:44:47.665595+00	56	rmg5 || Obra-04 Calle Octava || SALIDA -  A_TIEMPO	2	[{"changed": {"fields": ["Latitud"]}}]	9	1
+100	2026-11-18 22:45:11.772926+00	56	rmg5 || Obra-04 Calle Octava || SALIDA -  A_TIEMPO	2	[{"changed": {"fields": ["Latitud"]}}]	9	1
+101	2026-11-18 23:11:23.938762+00	4	Obra-02 Trabajo || Obra: Activa || Radio: 25.0m || Horario: 08:00:00-17:00:00	2	[{"changed": {"fields": ["Hora de Entrada"]}}]	10	1
 \.
 
 
@@ -674,6 +684,7 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 28	asistencias	0006_sucursal_activa	2026-11-13 14:58:22.474621+00
 29	asistencias	0002_alter_sucursal_options_alter_sucursal_nombre_and_more	2026-11-18 15:38:37.79809+00
 30	asistencias	0003_alter_sucursal_options_and_more	2026-11-18 15:38:37.811516+00
+31	asistencias	0004_alter_registroasistencia_fecha_hora	2026-11-18 20:38:46.692428+00
 \.
 
 
@@ -689,6 +700,7 @@ em9cgjvisjzx3g3egi9km8fch69czbfv	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIq
 a2mr6od49fzhrq07x5j89m1f3qb5ubfv	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xMpeR:-8GN77j1jxrkra9JMAJjNegcywsNHq3HmBQCIfV5sNk	2026-11-13 16:40:23.018914+00
 c0ltwctxjre4tmyhxkghfyefba19tkr8	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xQmwj:-K1TXfIY-9_yrlquo8QTkuScEMNWM4vAO2LT1yAzB4g	2026-11-24 14:35:37.349753+00
 73rnni89dnavyczklwip6zs4nl46qr7v	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xQn2I:zFsiop1qrCdCYnr8xjJrWXccaMkaNViXlQiR5Lp7vpA	2026-11-24 14:41:22.589061+00
+500ad3g6sg0t6zspa83learyw4q6t8b4	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xTltg:G2LnMLId-nFabbFhIko0roTyVh8dW9jU4PfYvcLz3sE	2026-12-02 20:04:48.521405+00
 \.
 
 
@@ -696,14 +708,14 @@ c0ltwctxjre4tmyhxkghfyefba19tkr8	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIq
 -- Name: asistencias_registroasistencia_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 52, true);
+SELECT pg_catalog.setval('public.asistencias_registroasistencia_id_seq', 56, true);
 
 
 --
 -- Name: asistencias_sucursal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.asistencias_sucursal_id_seq', 14, true);
+SELECT pg_catalog.setval('public.asistencias_sucursal_id_seq', 15, true);
 
 
 --
@@ -752,7 +764,7 @@ SELECT pg_catalog.setval('public.auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.django_admin_log_id_seq', 92, true);
+SELECT pg_catalog.setval('public.django_admin_log_id_seq', 101, true);
 
 
 --
@@ -766,7 +778,7 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 10, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: admin
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 30, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 31, true);
 
 
 --
@@ -943,6 +955,13 @@ ALTER TABLE ONLY public.django_migrations
 
 ALTER TABLE ONLY public.django_session
     ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: asistencias_registroasistencia_fecha_hora_879c9bd9; Type: INDEX; Schema: public; Owner: admin
+--
+
+CREATE INDEX asistencias_registroasistencia_fecha_hora_879c9bd9 ON public.asistencias_registroasistencia USING btree (fecha_hora);
 
 
 --
@@ -1164,5 +1183,5 @@ ALTER TABLE ONLY public.django_admin_log
 -- PostgreSQL database dump complete
 --
 
-\unrestrict oaPcgGaQaHxva5D1GjrxsYJHh1f6E7iWwCENtusC7W9IDuZn2VaEBhRCagzvglD
+\unrestrict 3Va59tAzZTsDzQwXgEQk5Gbn1FFBH1yYqlA4V2M4GJLHZqY9T1fSLwuYfyWbiBB
 

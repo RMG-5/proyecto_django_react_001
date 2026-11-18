@@ -20,7 +20,13 @@ export default function Login({ onLoginSuccess, mostrarToast }) {
       setPassword("");
       onLoginSuccess(response.data.is_admin);
     } catch (err) {
-      if (err.response?.status === 400 || err.response?.status === 401) {
+      if (err.response?.status === 429) {
+        const segundos = err.response.headers?.["retry-after"] || 60;
+        mostrarToast(
+          "error",
+          `Demasiados intentos fallidos. Por seguridad, espera ${segundos} segundos antes de volver a intentar.`,
+        );
+      } else if (err.response?.status === 400 || err.response?.status === 401) {
         mostrarToast("error", "Usuario o contraseña incorrectos.");
       } else {
         mostrarToast(

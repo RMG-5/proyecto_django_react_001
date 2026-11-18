@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.response import Response
 from .models import Sucursal, RegistroAsistencia
 from .serializers import SucursalSerializer, RegistroAsistenciaSerializer, AdminUserWriteSerializer
@@ -115,18 +116,18 @@ def calcular_jornadas_registros(queryset):
                     segundos_reales = diferencia.total_seconds()
 
                     # Valida que el turno sea coherente: mayor a 0s y máximo 18 horas (64,800s)
-                    # Esto evita emparejar una salida de hoy con una entrada olvidada de hace varios días
                     if 0 < segundos_reales <= 64800:
                         horas = int(segundos_reales // 3600)
                         minutos = int((segundos_reales % 3600) // 60)
-                        texto_tiempo = f"{horas}h {minutos}m"
-                        cumplio = segundos_reales >= segundos_meta
+                        texto_tiempo = f"{horas}h {minutos}m"                        
+                        segundos_meta_entrada, texto_meta_entrada = obtener_meta_sucursal(entrada_pendiente.sucursal)
+                        cumplio = segundos_reales >= segundos_meta_entrada
 
                         # Asigna el mismo resumen de jornada tanto al registro de entrada como al de salida
                         info_turno = {
                             'horas_trabajadas': texto_tiempo,
                             'cumplio_jornada': cumplio,
-                            'jornada_meta_texto': texto_meta,
+                            'jornada_meta_texto': texto_meta_entrada,
                         }
                         resultados[entrada_pendiente.id] = info_turno
                         resultados[reg.id] = info_turno
@@ -167,6 +168,7 @@ class CustomAuthTokenSerializer(AuthTokenSerializer):
 # Vista de autenticación que devuelve el token de acceso y el rol de administrador
 class CustomAuthToken(ObtainAuthToken):
     serializer_class = CustomAuthTokenSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(
@@ -250,6 +252,11 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
             inicio_naive = datetime.strptime(fecha_inicio_param, "%Y-%m-%d")
             fin_naive = datetime.strptime(fecha_fin_param, "%Y-%m-%d")
 
+            if (fin_naive - inicio_naive).days > 61:
+                raise ValidationError({
+                    "error": "El rango máximo de consulta permitido es de 61 días (2 meses)."
+                })
+
             inicio_con_hora = datetime.combine(inicio_naive.date(), datetime.min.time())
             fin_con_hora = datetime.combine(fin_naive.date(), datetime.max.time())
             
@@ -322,7 +329,10 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
         ]
         ws.append(cabeceras)
 
-        asistencias = self.filter_queryset(self.get_queryset())
+        asistencias = (
+            self.filter_queryset(self.get_queryset())
+            .select_related('usuario', 'sucursal')
+        )
         calculos_jornada = calcular_jornadas_registros(asistencias)
 
         for asis in asistencias:
@@ -464,7 +474,10 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
                 estatus_final = 'A_TIEMPO'
 
         elif sucursal_detectada.hora_entrada and tipo_evento == 'SALIDA':
-            estatus_final = 'ANTICIPADA'
+            if segundos_transcurridos < segundos_meta:
+                estatus_final = 'ANTICIPADA'
+            else:
+                estatus_final = 'A_TIEMPO'
 
         serializer.save(
             usuario=usuario,
