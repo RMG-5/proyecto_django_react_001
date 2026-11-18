@@ -1,0 +1,6 @@
+/* 1. Importamos todo el núcleo de Tailwind v4 en una sola línea */
+@import "tailwindcss";
+
+/* 2. Configuración nativa de v4: Le indicamos qué archivos escanear */
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx}";
