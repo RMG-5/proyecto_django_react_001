@@ -26,7 +26,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 // Función para obtener el icono correspondiente según el estatus
 export const obtenerIconoPorEstatus = (estatus) => {
   if (estatus === "A_TIEMPO") return iconoVerde;
-  if (estatus === "RETARDO" || "ANTICIPADA") return iconoRojo;
+  if (estatus === "RETARDO" || estatus === "ANTICIPADA") return iconoRojo;
   return iconoGris;
 };
 

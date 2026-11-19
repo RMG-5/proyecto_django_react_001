@@ -211,7 +211,26 @@ class SucursalViewSet(viewsets.ModelViewSet):
 class UsuarioAdminViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
     authentication_classes = [TokenAuthentication]
-    queryset = User.objects.all().order_by('username')
+
+    def get_queryset(self):
+        return User.objects.filter(is_superuser=False).order_by('username')
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if instance == request.user:
+            return Response(
+                {"error": "No puedes eliminar tu propia cuenta de administrador."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if instance.is_superuser:
+            return Response(
+                {"error": "No se puede eliminar al superusuario del sistema."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().destroy(request, *args, **kwargs)
 
     # Usa un serializador ligero para listar/consultar y otro completo con validaciones para crear/editar
     def get_serializer_class(self):
@@ -237,13 +256,12 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
 
         # Optimiza la consulta trayendo las relaciones usuario y sucursal en un solo JOIN
         if user.is_staff:
-            queryset = RegistroAsistencia.objects.select_related('usuario', 'sucursal').all()
+            queryset = RegistroAsistencia.objects.select_related('usuario', 'sucursal').all().exclude(usuario__is_superuser=True)
         else:
             queryset = RegistroAsistencia.objects.select_related('usuario', 'sucursal').filter(usuario=user)
 
         fecha_inicio_param = self.request.query_params.get('fecha_inicio')
         fecha_fin_param = self.request.query_params.get('fecha_fin')
-        sucursal_param = self.request.query_params.get('sucursal_id')
         usuario_id_param = self.request.query_params.get('usuario_id')
 
         tz = timezone.get_current_timezone()
@@ -271,22 +289,33 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(
                 fecha_hora__range=[timezone.now() - timedelta(days=14), timezone.now()])
 
-        if sucursal_param and sucursal_param != "TODAS":
-            queryset = queryset.filter(sucursal_id=sucursal_param)
-
         if usuario_id_param and usuario_id_param != "TODOS" and user.is_staff:
             queryset = queryset.filter(usuario__username=usuario_id_param)
 
         return queryset.order_by('-fecha_hora')
 
+    def _obtener_registros_y_calculos(self):
+        # 1. Trae los registros filtrados por fecha y usuario (SIN filtrar por sucursal todavía)
+        asistencias = list(self.filter_queryset(self.get_queryset()))
+        
+        # 2. Calcula las jornadas con el historial completo (empareja Obra A + Obra B)
+        calculos_jornada = calcular_jornadas_registros(asistencias)
+
+        # 3. Ahora sí, filtra por sucursal si el usuario seleccionó una en específico
+        sucursal_param = self.request.query_params.get('sucursal_id')
+        if sucursal_param and sucursal_param != "TODAS":
+            asistencias = [
+                a for a in asistencias if str(a.sucursal_id) == str(sucursal_param)
+            ]
+
+        return asistencias, calculos_jornada
+
     # Sobrescribe el listado JSON para inyectar las horas trabajadas calculadas dinámicamente
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        asistencias, calculos_jornada = self._obtener_registros_y_calculos()
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(asistencias, many=True)
         datos_enriquecidos = serializer.data
-
-        calculos_jornada = calcular_jornadas_registros(queryset)
 
         for item in datos_enriquecidos:
             info = calculos_jornada.get(
@@ -309,40 +338,22 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
         if not request.user.is_staff:
             return Response({"error": "No autorizado"}, status=403)
 
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Reporte Asistencias"
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet(title="Reporte Asistencias")
 
         cabeceras = [
-            "ID",
-            "Empleado",
-            "Obra",
-            "Fecha y Hora Local",
-            "Tipo de Evento",
-            "Estatus Puntualidad",
-            "Tiempo Total Turno",
-            "Meta Turno",
-            "Cumplió Jornada",
-            "Latitud",
-            "Longitud",
-            "Dispositivo",
+            "ID", "Empleado", "Obra", "Fecha y Hora Local",
+            "Tipo de Evento", "Estatus Puntualidad", "Tiempo Total Turno",
+            "Meta Turno", "Cumplió Jornada", "Latitud", "Longitud", "Dispositivo",
         ]
         ws.append(cabeceras)
 
-        asistencias = (
-            self.filter_queryset(self.get_queryset())
-            .select_related('usuario', 'sucursal')
-        )
-        calculos_jornada = calcular_jornadas_registros(asistencias)
+        asistencias, calculos_jornada = self._obtener_registros_y_calculos()
 
         for asis in asistencias:
             fecha_local = timezone.localtime(asis.fecha_hora)
             info_jornada = calculos_jornada.get(asis.id, {})
-            cumplio_texto = (
-                "SÍ"
-                if info_jornada.get('cumplio_jornada')
-                else "NO / INCOMPLETO"
-            )
+            cumplio_texto = "SÍ" if info_jornada.get('cumplio_jornada') else "NO / INCOMPLETO"
 
             ws.append([
                 asis.id,
@@ -381,7 +392,8 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
 
         # 1. Validación de secuencia lógica de turnos (evita entradas dobles o salidas sin entrada)
         ultimo_registro = (
-            RegistroAsistencia.objects.filter(
+            RegistroAsistencia.objects.select_related('sucursal')
+            .filter(
                 usuario=usuario,
                 fecha_hora__gte=ahora_utc - timedelta(hours=18),
             )
@@ -430,7 +442,8 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
                 })
 
         # 2. Algoritmo de Geocerca Dinámica: busca la sucursal activa más cercana dentro de su radio
-        sucursales = Sucursal.objects.filter(activa=True)
+        sucursales = Sucursal.objects.filter(activa=True).only(
+            'id', 'nombre', 'latitud', 'longitud', 'radio_maximo_metros', 'hora_entrada', 'hora_salida', 'tolerancia_minutos')
         sucursal_detectada = None
         menor_distancia = float('inf')  # Inicia en infinito para ir guardando la distancia mínima real
 

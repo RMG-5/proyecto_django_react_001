@@ -106,7 +106,9 @@ export default function AdminUsuarios({ mostrarToast, pedirConfirmacion }) {
         } catch (err) {
           mostrarToast(
             "error",
-            err.response?.data?.detail || "No se pudo eliminar al usuario.",
+            err.response?.data?.error ||
+              err.response?.data?.detail ||
+              "No se pudo eliminar al usuario.",
           );
         }
       },

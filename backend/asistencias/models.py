@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 
 
 # Modelo para representar las sucursales de la empresa
@@ -9,14 +10,20 @@ class Sucursal(models.Model):
     latitud = models.DecimalField(max_digits=9, decimal_places=6)
     longitud = models.DecimalField(max_digits=9, decimal_places=6)
     radio_maximo_metros = models.DecimalField(
-        max_digits=5, decimal_places=1, default=50.0, verbose_name="Distancia máxima para checar")
+        max_digits=5,
+        decimal_places=1,
+        default=50.0,
+        validators=[MinValueValidator(5.0)],
+        verbose_name="Distancia máxima para checar",
+    )
     hora_entrada = models.TimeField(
         null=True, blank=True, verbose_name="Hora de Entrada")
     hora_salida = models.TimeField(
         null=True, blank=True, verbose_name="Hora de Salida")
     tolerancia_minutos = models.IntegerField(
         default=10, verbose_name="Minutos de Tolerancia")
-    activa = models.BooleanField(default=True, verbose_name="Obra Activa")
+    activa = models.BooleanField(
+        default=True, db_index=True, verbose_name="Obra Activa")
 
     class Meta:
         ordering = ['nombre']
@@ -66,6 +73,10 @@ class RegistroAsistencia(models.Model):
         ordering = ['-fecha_hora']
         verbose_name = "Registro de Asistencia"
         verbose_name_plural = "Registros de Asistencias"
+        indexes = [
+            models.Index(fields=['usuario', '-fecha_hora']),
+            models.Index(fields=['sucursal', '-fecha_hora']),
+        ]
 
     def __str__(self):
         prefijo = "HORARIO" if self.estatus == 'LIBRE' else ""

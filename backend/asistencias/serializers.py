@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -14,6 +13,9 @@ User = get_user_model()
 
 # Serializador para gestionar la información y geocercas de las sucursales
 class SucursalSerializer(serializers.ModelSerializer):
+    latitud = serializers.DecimalField(max_digits=9, decimal_places=6, min_value=-90, max_value=90)
+    longitud = serializers.DecimalField(max_digits=9, decimal_places=6, min_value=-180, max_value=180)
+    
     class Meta:
         model = Sucursal
         fields = [
@@ -94,10 +96,22 @@ class AdminUserWriteSerializer(serializers.ModelSerializer):
                 "El nombre de usuario solo puede contener letras, números y los caracteres: @, ., +, -, _"
             )
 
+        qs = User.objects.filter(username=db_username)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Este nombre de usuario ya está en uso.")
+
         return db_username
 
     # Validación general: verifica obligatoriedad, coincidencia y seguridad de contraseñas
     def validate(self, attrs):
+        request = self.context.get('request')
+        if self.instance and request and self.instance == request.user:
+            if attrs.get('is_staff') is False:
+                raise serializers.ValidationError({
+                    "is_admin": "No puedes quitarte tus propios permisos de administrador."
+                })
         username = attrs.get('username')
         password = attrs.get('password')
         password_confirm = attrs.get('password_confirm')
