@@ -7,12 +7,28 @@ from django.utils.html import format_html
 @admin.register(Sucursal)
 class SucursalAdmin(admin.ModelAdmin):
     # Columnas que se mostrarán en la tabla principal
-    list_display = ('id', 'nombre', 'hora_entrada', 'hora_salida', 'tolerancia_minutos', 
-                    'latitud', 'longitud', 'radio_con_sufijo', 'activa')              
+    list_display = ('id', 'nombre', 'latitud', 'longitud', 'radio_con_sufijo',
+                    'hora_entrada', 'hora_salida', 'tolerancia_minutos', 'activa',)              
     # Filtros laterales disponibles
-    list_filter = ('nombre', 'activa')
+    list_filter = ('nombre', 'activa',)
     # Campos habilitados para la barra de búsqueda
     search_fields = ('nombre',)
+
+    fieldsets = (
+            ('Información General', {
+                'fields': ('nombre', 'activa',)
+            }),
+            ('Ubicación & Geocerca', {
+                'description': 'Coordenadas para la validación de asistencia \
+                    en campo, mediante la fórmula Haversine.',
+                'fields': ('latitud', 'longitud', 'radio_maximo_metros',)                
+            }),
+            ('Horario y tolerancia', {
+                'description': 'Los horarios son opcionales, si no se llenan los campos, \
+                    el sistema validara que el usuario cumpla con una jornada de 9 hrs.', 
+                'fields': ('hora_entrada', 'hora_salida', 'tolerancia_minutos',)
+            }),            
+        )
 
     # Recursos estáticos adicionales (CSS y JS) para el mapa interactivo
     class Media:
@@ -36,8 +52,8 @@ class SucursalAdmin(admin.ModelAdmin):
 @admin.register(RegistroAsistencia)
 class RegistroAsistenciaAdmin(admin.ModelAdmin):
     # Columnas que se mostrarán en la tabla principal
-    list_display = ('usuario', 'fecha_hora', 'sucursal', 'tipo',
-                    'estatus', 'coordenadas_click')
+    list_display = ('usuario', 'tipo', 'estatus', 'fecha_hora', 
+                    'sucursal', 'coordenadas_click',)
     # Filtros laterales disponibles
     list_filter = ('tipo', 'usuario', 'fecha_hora',)
     # Campos habilitados para la barra de búsqueda
@@ -46,7 +62,18 @@ class RegistroAsistenciaAdmin(admin.ModelAdmin):
     # Campos de solo lectura dentro del formulario de edición
     readonly_fields = ('fecha_hora',)
 
-# ======================================================================================
+    fieldsets = (
+                ('Datos Generales', {
+                    'fields': ('usuario', 'tipo', 'estatus', 'dispositivo',)
+                }),
+                ('Obra y Coordenadas donde se registro la checada', {
+                    'fields': ('sucursal', 'latitud', 'longitud',)                
+                }),
+                ('Fecha y hora (solo lectura, no se puede modificar)', {
+                    'fields': ('fecha_hora',)
+                }),            
+            )
+
 # ======================================================================================
     def coordenadas_click(self, obj):
         """
@@ -68,5 +95,4 @@ class RegistroAsistenciaAdmin(admin.ModelAdmin):
     # Propiedad del método que altera el comportamiento en la interfaz del admin.
     # Reemplaza el nombre técnico del método ('coordenadas_click') por la palabra "Ubicación" en el encabezado de la columna.
     coordenadas_click.short_description = "Ubicación"
-# ======================================================================================
 # ======================================================================================

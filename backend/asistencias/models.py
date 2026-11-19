@@ -23,7 +23,11 @@ class Sucursal(models.Model):
     tolerancia_minutos = models.IntegerField(
         default=10, verbose_name="Minutos de Tolerancia")
     activa = models.BooleanField(
-        default=True, db_index=True, verbose_name="Obra Activa")
+        default=True, 
+        db_index=True, 
+        verbose_name="Obra Activa", 
+        help_text="Indica si la obra debe ser tratada como un obra activa. \
+            Desactive este campo en lugar de eliminar obras.")
 
     class Meta:
         ordering = ['nombre']

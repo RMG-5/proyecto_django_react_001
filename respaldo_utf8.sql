@@ -1,8 +1,8 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
-\restrict Apf9WfBsORvr3FhTOv8a1KKBVpLzyUmafrgvVT8vAkcyJiD4hQKDIavdc9RkJsQ
+\restrict N97FIDc54SUqWpeatyKyEkUqpYPzC6GXCEElTcgdSHy5xTHRcdBfl1ras0iNCf0
 
 -- Dumped from database version 18.6 (Debian 18.6-1.pgdg13+2)
 -- Dumped by pg_dump version 18.6 (Debian 18.6-1.pgdg13+2)
@@ -497,8 +497,8 @@ COPY public.auth_user (id, password, last_login, is_superuser, username, first_n
 20	pbkdf2_sha256$1500000$iG6yhXmy3me8VxWtnN3sNA$gjSdf94vWndUZZdfgdv4HloMBKnw18S/xr4BYcoMQ98=	\N	f	nancy_chavez_123				t	t	2026-11-09 14:34:29.915519+00
 26	pbkdf2_sha256$1500000$vZ3RIvFTVAiCGWdVIPYQtW$0Q3P3CpzpiOFIH73jHiaM0YmoQBXQ8RNWWjDe5bdlxE=	\N	f	ricardo_garcia_555				t	t	2026-11-19 15:30:00.271831+00
 21	pbkdf2_sha256$1500000$TFbLgJ9Q0w4svStikqeQvV$5H9bpTV0q8Jr5d9sru5rnHKjpHYWD3FwtsefpxMa5zo=	\N	f	hector_leonardo_123				f	t	2026-11-09 14:35:21.528989+00
-1	pbkdf2_sha256$1500000$dIV5sN3ldrvNlu8KMdCJnq$S3aWanwSUFJ72vC+/gmm0GIY2UiOlaN80oVvrKK6k7M=	2026-11-19 16:34:50.133655+00	t	rmg5	Ricardo	Garcia	ricardo.garcia@checador.mx	t	t	2026-10-23 15:08:05+00
 14	pbkdf2_sha256$1500000$WBn7RR924VaUhi0NhHlxUF$HHFKEqQlFUb4d9wbohztsWG622h+dd9SQv8/v7kbKD4=	\N	f	brayan_omar_123				f	t	2026-10-30 18:23:58+00
+1	pbkdf2_sha256$1500000$dIV5sN3ldrvNlu8KMdCJnq$S3aWanwSUFJ72vC+/gmm0GIY2UiOlaN80oVvrKK6k7M=	2026-11-19 22:05:41.658282+00	t	rmg5	Ricardo	Garcia	ricardo.garcia@checador.mx	t	t	2026-10-23 15:08:05+00
 \.
 
 
@@ -712,8 +712,8 @@ em9cgjvisjzx3g3egi9km8fch69czbfv	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIq
 00ovt62znd1ijgjzndhq7o7l86uxg8ji	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xMntw:zesnowChEGeq-uat15DneFcrHxIlkB3AcgM_wtXRWL8	2026-11-13 14:48:16.060442+00
 a2mr6od49fzhrq07x5j89m1f3qb5ubfv	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xMpeR:-8GN77j1jxrkra9JMAJjNegcywsNHq3HmBQCIfV5sNk	2026-11-13 16:40:23.018914+00
 c0ltwctxjre4tmyhxkghfyefba19tkr8	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xQmwj:-K1TXfIY-9_yrlquo8QTkuScEMNWM4vAO2LT1yAzB4g	2026-11-24 14:35:37.349753+00
-500ad3g6sg0t6zspa83learyw4q6t8b4	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xTltg:G2LnMLId-nFabbFhIko0roTyVh8dW9jU4PfYvcLz3sE	2026-12-02 20:04:48.521405+00
 ow75qai5dk8jvsszjn00sim83cnz817h	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xU562:ob6nB5kI1ohoNkMTU545BjodqDVg-sfjIHuvffh-K8k	2026-12-03 16:34:50.136093+00
+d84674xw464tga25mlgx2kw9g7mp26p4	.eJxVjDsOwjAQBe_iGlle_FmHkj5niOzdNQ4gR8qnQtwdIqWA9s3Me6khbWsdtkXmYWR1UaBOv1tO9JC2A76ndps0TW2dx6x3RR900f3E8rwe7t9BTUv91gZjgYSEYskAntl766GgSOnAWCOOxSNFJJsDJ-NLhuAixULBAXfq_QHaoTfa:1xUAGD:SiEq18YmICTbKTZ1nkIua5O_He1C4y6GIrXUV6B2sNM	2026-12-03 22:05:41.660534+00
 \.
 
 
@@ -1217,5 +1217,5 @@ ALTER TABLE ONLY public.django_admin_log
 -- PostgreSQL database dump complete
 --
 
-\unrestrict Apf9WfBsORvr3FhTOv8a1KKBVpLzyUmafrgvVT8vAkcyJiD4hQKDIavdc9RkJsQ
+\unrestrict N97FIDc54SUqWpeatyKyEkUqpYPzC6GXCEElTcgdSHy5xTHRcdBfl1ras0iNCf0
 
