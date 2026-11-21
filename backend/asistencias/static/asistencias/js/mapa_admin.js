@@ -1,14 +1,14 @@
-// JavaScript para el mapa de administración de sucursales en Django Admin
+// JavaScript para el mapa de administración de obras en Django Admin
 document.addEventListener("DOMContentLoaded", function () {
   // Referencias a los campos generados por Django
   const inputLat = document.getElementById("id_latitud");
   const inputLon = document.getElementById("id_longitud");
   const inputRadio = document.getElementById("id_radio_maximo_metros");
 
-  // Detener ejecución si no estamos en el formulario de edición/creación
+  // Detiene la ejecución si no esta en el formulario de edición/creación
   if (!inputLat || !inputLon) return;
 
-  // Fijamos la versión 1.9.4 en las rutas de los íconos para evitar redirecciones
+  // Fija la versión 1.9.4 en las rutas de los íconos para evitar redirecciones
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl:
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
   });
 
-  // Creación y estilos del contenedor del mapa
+  // Crea el contenedor y los estilos del mapa
   const contenedorMapa = document.createElement("div");
   contenedorMapa.id = "admin-mapa-sucursal";
   Object.assign(contenedorMapa.style, {
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
     border: "1px solid #ccc",
   });
 
-  // Insertar el mapa justo antes de la fila de latitud
+  // Inserta el mapa justo antes de la fila de latitud
   const filaFormulario =
     inputLat.closest(".form-row") || inputLat.parentElement;
   filaFormulario.before(contenedorMapa);
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
     actualizarDesdeMapa(pos.lat, pos.lng);
   });
 
-  // EVENTO C: Centra el mapa si el administrador decide teclear latitud y longitud
+  // EVENTO C: Centra el mapa si el administrador decide escribir latitud y/o longitud manualmente
   inputLat.addEventListener("change", actualizarDesdeInputs);
   inputLon.addEventListener("change", actualizarDesdeInputs);
   if (inputRadio) {

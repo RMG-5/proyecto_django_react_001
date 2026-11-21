@@ -3,6 +3,18 @@ import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import api from "../api/axiosClient";
 import { CentrarMapa } from "../components/MapIcons";
 
+const obtenerDeviceId = () => {
+  let deviceId = localStorage.getItem("checador_device_id");
+  if (!deviceId) {
+    deviceId =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `dev-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+    localStorage.setItem("checador_device_id", deviceId);
+  }
+  return deviceId;
+};
+
 // Componente EmpleadoView que permite a los empleados capturar su ubicación y registrar asistencia
 export default function EmpleadoView({
   sucursales,
@@ -50,6 +62,7 @@ export default function EmpleadoView({
         tipo: tipoEvento,
         latitud: parseFloat(latitud).toFixed(6),
         longitud: parseFloat(longitud).toFixed(6),
+        device_id: obtenerDeviceId(),
         dispositivo: navigator.userAgent.substring(0, 100),
         confirmar_anticipada: confirmarAnticipada,
       });

@@ -15,7 +15,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.response import Response
-from .models import Sucursal, RegistroAsistencia
+from .models import Sucursal, RegistroAsistencia, PerfilEmpleado
 from .serializers import SucursalSerializer, RegistroAsistenciaSerializer, AdminUserWriteSerializer
 
 
@@ -128,6 +128,7 @@ def calcular_jornadas_registros(queryset):
                             'horas_trabajadas': texto_tiempo,
                             'cumplio_jornada': cumplio,
                             'jornada_meta_texto': texto_meta_entrada,
+                            'segundos_reales': segundos_reales,
                         }
                         resultados[entrada_pendiente.id] = info_turno
                         resultados[reg.id] = info_turno
@@ -213,7 +214,24 @@ class UsuarioAdminViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
 
     def get_queryset(self):
-        return User.objects.filter(is_superuser=False).order_by('username')
+        return User.objects.select_related('perfil').filter(is_superuser=False).order_by('username')
+
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            class UserListSerializer(serializers.ModelSerializer):
+                tiene_dispositivo = serializers.SerializerMethodField()
+
+                class Meta:
+                    model = User
+                    fields = ['id', 'username', 'is_staff', 'tiene_dispositivo']
+
+                def get_tiene_dispositivo(self, obj):
+                    perfil = getattr(obj, 'perfil', None)
+                    return bool(perfil and perfil.device_id)
+
+            return UserListSerializer
+
+        return AdminUserWriteSerializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -232,16 +250,15 @@ class UsuarioAdminViewSet(viewsets.ModelViewSet):
 
         return super().destroy(request, *args, **kwargs)
 
-    # Usa un serializador ligero para listar/consultar y otro completo con validaciones para crear/editar
-    def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
-            class UserListSerializer(serializers.ModelSerializer):
-                class Meta:
-                    model = User
-                    fields = ['id', 'username', 'is_staff']
-            return UserListSerializer
-
-        return AdminUserWriteSerializer
+    # Endpoint para liberar el teléfono de un empleado si cambió de equipo
+    @action(detail=True, methods=['post'], url_path='desvincular-dispositivo')
+    def desvincular_dispositivo(self, request, pk=None):
+        usuario_obj = self.get_object()
+        perfil, _ = PerfilEmpleado.objects.get_or_create(usuario=usuario_obj)
+        perfil.device_id = None
+        perfil.fecha_vinculacion = None
+        perfil.save()
+        return Response({"mensaje": "Dispositivo desvinculado correctamente."})
 
 
 # Gestión de asistencias: consultas filtradas, exportación a Excel y validación GPS al checar
@@ -339,23 +356,28 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
             return Response({"error": "No autorizado"}, status=403)
 
         wb = Workbook(write_only=True)
-        ws = wb.create_sheet(title="Reporte Asistencias")
 
-        cabeceras = [
+        # --- PESTAÑA 1: REPORTE DETALLADO ---
+        ws_detalle = wb.create_sheet(title="Detalle Asistencias")
+
+        cabeceras_detalle = [
             "ID", "Empleado", "Obra", "Fecha y Hora Local",
             "Tipo de Evento", "Estatus Puntualidad", "Tiempo Total Turno",
             "Meta Turno", "Cumplió Jornada", "Latitud", "Longitud", "Dispositivo",
         ]
-        ws.append(cabeceras)
+        ws_detalle.append(cabeceras_detalle)
 
         asistencias, calculos_jornada = self._obtener_registros_y_calculos()
+
+        resumen_empleados = {}
 
         for asis in asistencias:
             fecha_local = timezone.localtime(asis.fecha_hora)
             info_jornada = calculos_jornada.get(asis.id, {})
-            cumplio_texto = "SÍ" if info_jornada.get('cumplio_jornada') else "NO / INCOMPLETO"
+            cumplio = info_jornada.get('cumplio_jornada', False)
+            cumplio_texto = "SÍ" if cumplio else "NO / INCOMPLETO"
 
-            ws.append([
+            ws_detalle.append([
                 asis.id,
                 asis.usuario.username.replace("_", " ").title(),
                 asis.sucursal.nombre,
@@ -370,6 +392,66 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
                 asis.dispositivo or "Desconocido",
             ])
 
+            uid = asis.usuario_id
+            if uid not in resumen_empleados:
+                resumen_empleados[uid] = {
+                    'nombre': asis.usuario.username.replace("_", " ").title(),
+                    'segundos_totales': 0,
+                    'turnos_completos': 0,
+                    'turnos_cumplidos': 0,
+                    'turnos_incompletos': 0,
+                    'retardos': 0,
+                    'salidas_anticipadas': 0,
+                }
+
+            datos_emp = resumen_empleados[uid]
+
+            if asis.estatus == 'RETARDO':
+                datos_emp['retardos'] += 1
+            elif asis.estatus == 'ANTICIPADA':
+                datos_emp['salidas_anticipadas'] += 1
+
+            segundos_turno = info_jornada.get('segundos_reales', 0)
+            if asis.tipo == 'SALIDA' and segundos_turno > 0:
+                datos_emp['segundos_totales'] += segundos_turno
+                datos_emp['turnos_completos'] += 1
+                if cumplio:
+                    datos_emp['turnos_cumplidos'] += 1
+            elif info_jornada.get('horas_trabajadas') in ("Falta Salida", "En curso / Falta Salida", "Falta Entrada"):
+                datos_emp['turnos_incompletos'] += 1
+
+        # --- PESTAÑA 2: RESUMEN TOTAL POR EMPLEADO ---
+        ws_resumen = wb.create_sheet(title="Resumen por Empleado")
+        cabeceras_resumen = [
+            "Empleado",
+            "Total Horas Trabajadas",
+            "Horas (Formato Decimal)",
+            "Turnos Completados",
+            "Turnos que Cumplieron Meta",
+            "Turnos Incompletos",
+            "Total Retardos",
+            "Total Salidas Anticipadas",
+        ]
+        ws_resumen.append(cabeceras_resumen)
+
+        for datos in sorted(resumen_empleados.values(), key=lambda x: x['nombre']):
+            seg = datos['segundos_totales']
+            horas_ent = int(seg // 3600)
+            mins_ent = int((seg % 3600) // 60)
+            tiempo_legible = f"{horas_ent}h {mins_ent}m"
+            horas_decimal = round(seg / 3600, 2)  # Ideal para multiplicar directo por tarifa/hora en nómina
+
+            ws_resumen.append([
+                datos['nombre'],
+                tiempo_legible,
+                horas_decimal,
+                datos['turnos_completos'],
+                datos['turnos_cumplidos'],
+                datos['turnos_incompletos'],
+                datos['retardos'],
+                datos['salidas_anticipadas'],
+            ])
+
         response = HttpResponse(
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
@@ -378,7 +460,7 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
         return response
 
     # Lógica principal al registrar una checada: valida secuencia de turnos, geocerca GPS y puntualidad
-    def perform_create(self, serializer):
+    def perform_create(self, serializer):     
         try:
             empleado_lat = float(self.request.data.get('latitud'))
             empleado_lon = float(self.request.data.get('longitud'))
@@ -400,6 +482,35 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
             .order_by('-fecha_hora')
             .first()
         )
+
+        device_id = (self.request.data.get('device_id') or "").strip()
+        if not device_id:
+            raise ValidationError({
+                "error_geocerca": "No se pudo identificar tu dispositivo. Recarga la página e intenta de nuevo."
+            })
+
+        if not usuario.is_staff:
+            perfil, _ = PerfilEmpleado.objects.get_or_create(usuario=usuario)
+
+            if perfil.device_id and perfil.device_id != device_id:
+                raise ValidationError({
+                    "error_geocerca": "Este teléfono no está autorizado para tu cuenta. Pide al administrador desvincular tu dispositivo anterior."
+                })
+
+            usado_por_otro = RegistroAsistencia.objects.filter(
+                dispositivo__contains=device_id,
+                fecha_hora__gte=ahora_utc - timedelta(hours=12)
+            ).exclude(usuario=usuario).exists()
+
+            if usado_por_otro:
+                raise ValidationError({
+                    "error_geocerca": "Este dispositivo ya fue utilizado hoy por otro compañero."
+                })
+
+            if not perfil.device_id:
+                perfil.device_id = device_id
+                perfil.fecha_vinculacion = ahora_utc
+                perfil.save()
 
         if tipo_evento == 'ENTRADA':
             if ultimo_registro and ultimo_registro.tipo == 'ENTRADA':
@@ -492,10 +603,15 @@ class RegistroAsistenciaViewSet(viewsets.ModelViewSet):
             else:
                 estatus_final = 'A_TIEMPO'
 
+        navegador = (self.request.data.get('dispositivo') or "Desconocido")[:100]
+        
+        dispositivo_completo = f"{device_id} | {navegador}"[:155]
+
         serializer.save(
             usuario=usuario,
             sucursal=sucursal_detectada,
             estatus=estatus_final,
+            dispositivo=dispositivo_completo,
         )
 
         print(

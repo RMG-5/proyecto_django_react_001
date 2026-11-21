@@ -14,7 +14,6 @@ class Sucursal(models.Model):
         decimal_places=1,
         default=50.0,
         validators=[MinValueValidator(5.0)],
-        verbose_name="Distancia máxima para checar",
     )
     hora_entrada = models.TimeField(
         null=True, blank=True, verbose_name="Hora de Entrada")
@@ -85,3 +84,13 @@ class RegistroAsistencia(models.Model):
     def __str__(self):
         prefijo = "HORARIO" if self.estatus == 'LIBRE' else ""
         return f"{self.usuario.username} || {self.sucursal.nombre} || {self.tipo} - {prefijo} {self.estatus}"
+    
+
+class PerfilEmpleado(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+    device_id = models.CharField(max_length=100, blank=True, null=True, db_index=True, verbose_name="ID dispositivo")
+    fecha_vinculacion = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Perfil de {self.usuario.username} || Dispositivo: {self.device_id or 'Sin vincular'}"
+    

@@ -47,7 +47,15 @@ export default function AdminUsuarios({ mostrarToast, pedirConfirmacion }) {
           }),
         });
         setListaUsuarios((prev) =>
-          prev.map((u) => (u.id === idEditando ? res.data : u)),
+          prev.map((u) =>
+            u.id === idEditando
+              ? {
+                  ...u,
+                  ...res.data,
+                  is_staff: res.data.is_admin ?? res.data.is_staff,
+                }
+              : u,
+          ),
         );
         mostrarToast("exito", "¡Usuario actualizado con éxito!");
       } else {
@@ -57,7 +65,17 @@ export default function AdminUsuarios({ mostrarToast, pedirConfirmacion }) {
           password_confirm: passwordConfirm,
           is_admin: isAdmin,
         });
-        setListaUsuarios((prev) => [...prev, res.data]);
+        setListaUsuarios((prev) =>
+          prev.map((u) =>
+            u.id === idEditando
+              ? {
+                  ...u,
+                  ...res.data,
+                  is_staff: res.data.is_admin ?? res.data.is_staff,
+                }
+              : u,
+          ),
+        );
         mostrarToast("exito", "¡Usuario creado con éxito!");
       }
       limpiarFormulario();
@@ -291,6 +309,53 @@ export default function AdminUsuarios({ mostrarToast, pedirConfirmacion }) {
           >
             🗑️
           </button>
+
+          {idEditando &&
+            listaUsuarios.find((u) => u.id === idEditando)
+              ?.tiene_dispositivo && (
+              <button
+                type="button"
+                onClick={() => {
+                  const u = listaUsuarios.find(
+                    (user) => user.id === idEditando,
+                  );
+                  pedirConfirmacion({
+                    tipo: "advertencia",
+                    titulo: `Desvincular teléfono de "${u.username.replace(/_/g, " ")}"`,
+                    mensaje:
+                      "El empleado podrá registrar su asistencia desde un teléfono nuevo en su próxima checada.",
+                    textoConfirmar: "Sí, desvincular",
+                    onConfirm: async () => {
+                      try {
+                        await api.post(
+                          `/usuarios/${u.id}/desvincular-dispositivo/`,
+                        );
+                        setListaUsuarios((prev) =>
+                          prev.map((item) =>
+                            item.id === u.id
+                              ? { ...item, tiene_dispositivo: false }
+                              : item,
+                          ),
+                        );
+                        mostrarToast(
+                          "exito",
+                          "Dispositivo desvinculado. El empleado ya puede usar otro equipo.",
+                        );
+                      } catch {
+                        mostrarToast(
+                          "error",
+                          "No se pudo desvincular el dispositivo.",
+                        );
+                      }
+                    },
+                  });
+                }}
+                className="bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 font-bold px-3 py-2 rounded-xl text-xs transition-all"
+                title="Desvincular teléfono registrado"
+              >
+                📱🔓
+              </button>
+            )}
         </div>
       </div>
     </div>
